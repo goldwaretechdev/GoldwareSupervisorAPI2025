@@ -1,10 +1,12 @@
+using GW.Application.Repository;
+using GW.Application.Sevices;
 using GW.Core.Context;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<SupervisorContext>(opt =>
 {
@@ -12,6 +14,8 @@ builder.Services.AddDbContext<SupervisorContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SupervisorConnection"));
 
 });
+
+RegisterServices.Configure(builder.Services);
 
 
 var app = builder.Build();
