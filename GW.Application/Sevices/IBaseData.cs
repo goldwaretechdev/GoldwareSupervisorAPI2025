@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace GW.Application.Sevices
     {
         public string HashMaker(string plain);
         public string GenerateToken(Guid userId,int role);
+
     }
 
 
@@ -28,13 +30,15 @@ namespace GW.Application.Sevices
             _configuration = configuration;
         }
 
+        #region HashMaker
         public string HashMaker(string plain)
         {
             string hash = BCrypt.Net.BCrypt.EnhancedHashPassword(plain, 13);
             return hash;
         }
+        #endregion
 
-
+        #region GenerateToken
         public string GenerateToken(Guid userId, int role)
         {
             
@@ -56,7 +60,7 @@ namespace GW.Application.Sevices
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
+        #endregion     
 
     }
 }

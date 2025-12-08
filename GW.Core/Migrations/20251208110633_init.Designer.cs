@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20251207071044_init")]
+    [Migration("20251208110633_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -346,8 +346,8 @@ namespace GW.Core.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Username")
                         .IsRequired()

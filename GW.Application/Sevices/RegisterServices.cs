@@ -17,7 +17,7 @@ namespace GW.Application.Sevices
             services.AddScoped<IBaseData, BaseData>();
 
 
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddAutoMapper(typeof(RoleProfile).Assembly);
         }
     }
 }

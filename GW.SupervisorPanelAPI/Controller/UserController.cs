@@ -1,4 +1,5 @@
 ﻿using GW.Application.Repository;
+using GW.Application.Sevices;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Http;
@@ -11,14 +12,16 @@ namespace GW.SupervisorPanelAPI.Controller
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IBaseData _baseData;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository,IBaseData baseData)
         {
             _userRepository = userRepository;
+            _baseData = baseData;
         }
 
         [HttpPost]
-        public IActionResult Login(LoginInfo request)
+        public IActionResult Login([FromBody]LoginInfo request)
         {
             try
             {
@@ -30,12 +33,27 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
+
         [HttpPost]
-        public IActionResult Token(LoginInfo request)
+        public IActionResult Token([FromBody]LoginInfo request)
         {
             try
             {
                 var response = _userRepository.Token(request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Hash([FromBody]string pass)
+        {
+            try
+            {
+                var response = _baseData.HashMaker(pass);
                 return Ok(response);
             }
             catch (Exception ex)

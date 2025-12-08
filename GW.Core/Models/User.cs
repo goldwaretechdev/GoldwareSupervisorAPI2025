@@ -14,7 +14,7 @@ namespace GW.Core.Models
         public string FName { get; set; }
         [MaxLength(50)]
         public string LName { get; set; }
-        [MinLength(8), MaxLength(20)]
+        [MinLength(8), MaxLength(100)]
         public string Password { get; set; }
         [MaxLength(15)]
         public string Mobile { get; set; }
