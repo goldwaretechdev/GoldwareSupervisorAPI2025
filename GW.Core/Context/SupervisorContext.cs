@@ -10,6 +10,8 @@ namespace GW.Core.Context
 {
     public class SupervisorContext:DbContext
     {
+        private static readonly Guid SeedUserId = Guid.Parse("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05");
+
         public SupervisorContext(DbContextOptions<SupervisorContext> options):base(options) { }
 
 
@@ -125,7 +127,53 @@ namespace GW.Core.Context
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
+
+            SeedUser(builder);
         }
 
+        private void SeedUser(ModelBuilder builder)
+        {
+            builder.Entity<User>().HasData(
+                new User
+                {
+                    Id = SeedUserId,
+                    Username = "sdh",
+                    Password = "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6",
+                    FName = "s",
+                    LName = "hasanabadi",
+                    Mobile = "09155909973"
+                });
+
+            builder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = 1,
+                    Name = "Development"
+                },
+                new Role
+                {
+                    Id = 2,
+                    Name = "Production"
+                },
+                new Role
+                {
+                    Id = 3,
+                    Name = "Collaborators"
+                },
+                new Role
+                {
+                    Id = 4,
+                    Name = "Support"
+                });
+            builder.Entity<UserRoles>().HasData(
+                new UserRoles
+                {
+                    Id = 1,
+                    FkRoleId = 1,
+                    FkUserId = SeedUserId
+                });
+        }
     }
+
+   
 }

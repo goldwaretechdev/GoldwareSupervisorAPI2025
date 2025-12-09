@@ -20,6 +20,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _baseData = baseData;
         }
 
+        #region Login
         [HttpPost]
         public IActionResult Login([FromBody]LoginInfo request)
         {
@@ -33,7 +34,9 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
+        #endregion
 
+        #region Token
         [HttpPost]
         public IActionResult Token([FromBody]LoginInfo request)
         {
@@ -47,7 +50,9 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
+        #endregion
 
+        #region Hash
         [HttpPost]
         public IActionResult Hash([FromBody]string pass)
         {
@@ -61,5 +66,7 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
+        #endregion
+
     }
 }

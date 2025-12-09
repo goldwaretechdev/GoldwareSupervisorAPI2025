@@ -122,7 +122,6 @@ namespace GW.Core.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -272,6 +271,28 @@ namespace GW.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Development"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Production"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Collaborators"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Support"
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.SoftwareVersion", b =>
@@ -354,6 +375,17 @@ namespace GW.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"),
+                            FName = "s",
+                            LName = "hasanabadi",
+                            Mobile = "09155909973",
+                            Password = "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6",
+                            Username = "sdh"
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.UserAndCompany", b =>
@@ -400,6 +432,14 @@ namespace GW.Core.Migrations
                     b.HasIndex("FkUserId");
 
                     b.ToTable("UserRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FkRoleId = 1,
+                            FkUserId = new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05")
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.Access", b =>

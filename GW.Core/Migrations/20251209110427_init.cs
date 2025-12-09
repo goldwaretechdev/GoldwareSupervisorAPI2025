@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace GW.Core.Migrations
 {
     /// <inheritdoc />
@@ -93,7 +95,7 @@ namespace GW.Core.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
                     ProductCategory = table.Column<int>(type: "int", nullable: false),
                     BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -293,6 +295,27 @@ namespace GW.Core.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Development" },
+                    { 2, "Production" },
+                    { 3, "Collaborators" },
+                    { 4, "Support" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "FName", "LName", "Mobile", "Password", "Username" },
+                values: new object[] { new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"), "s", "hasanabadi", "09155909973", "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6", "sdh" });
+
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "Id", "FkRoleId", "FkUserId" },
+                values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Access_FkUnitId",

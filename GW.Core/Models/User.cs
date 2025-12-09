@@ -7,7 +7,7 @@ namespace GW.Core.Models
     public class User
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         [MaxLength(50)]
         public string Username { get; set; }
         [MaxLength(50)]
