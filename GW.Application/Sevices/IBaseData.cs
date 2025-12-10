@@ -60,7 +60,7 @@ namespace GW.Application.Sevices
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        #endregion     
+        #endregion
 
     }
 }
