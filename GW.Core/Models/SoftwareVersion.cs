@@ -16,6 +16,7 @@ namespace GW.Core.Models
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
+        public ProductCategory Category { get; set; }
         public string Path { get; set; }
 
 

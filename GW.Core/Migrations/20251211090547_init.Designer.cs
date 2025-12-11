@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20251209110427_init")]
+    [Migration("20251211090547_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -81,6 +81,24 @@ namespace GW.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Company");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Charge = 100000000,
+                            CreatedOn = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
+                            Name = "Goldware",
+                            ShortName = "GW"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Charge = 3,
+                            CreatedOn = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
+                            Name = "ASA Service",
+                            ShortName = "ASA"
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.Device", b =>
@@ -305,6 +323,9 @@ namespace GW.Core.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
 
                     b.Property<int>("DeviceType")
                         .HasColumnType("int");

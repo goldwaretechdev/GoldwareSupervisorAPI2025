@@ -11,6 +11,7 @@ namespace GW.Core.Context
     public class SupervisorContext:DbContext
     {
         private static readonly Guid SeedUserId = Guid.Parse("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05");
+        private static readonly DateTime SeedDate = DateTime.Parse("2025-12-11T09:30:00Z");
 
         public SupervisorContext(DbContextOptions<SupervisorContext> options):base(options) { }
 
@@ -165,6 +166,7 @@ namespace GW.Core.Context
                     Id = 4,
                     Name = "Support"
                 });
+
             builder.Entity<UserRoles>().HasData(
                 new UserRoles
                 {
@@ -172,6 +174,24 @@ namespace GW.Core.Context
                     FkRoleId = 1,
                     FkUserId = SeedUserId
                 });
+
+            builder.Entity<Company>().HasData(
+                new Company()
+                {
+                    Id = 1,
+                    Name = "Goldware",
+                    ShortName = "GW",
+                    Charge = 100_000_000,
+                    CreatedOn = SeedDate,
+                },  new Company()
+                {
+                    Id = 2,
+                    Name = "ASA Service",
+                    ShortName = "ASA",
+                    Charge = 3,
+                    CreatedOn = SeedDate,
+                }               
+                );
         }
     }
 

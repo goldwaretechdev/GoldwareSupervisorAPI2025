@@ -53,6 +53,7 @@ namespace GW.Core.Migrations
                     Version = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MicroType = table.Column<int>(type: "int", nullable: false),
                     DeviceType = table.Column<int>(type: "int", nullable: false),
+                    Category = table.Column<int>(type: "int", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -294,6 +295,15 @@ namespace GW.Core.Migrations
                         principalTable: "UserRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Company",
+                columns: new[] { "Id", "Charge", "CreatedOn", "Icon", "Name", "ShortName", "UpdatedOn" },
+                values: new object[,]
+                {
+                    { 1, 100000000, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), null, "Goldware", "GW", null },
+                    { 2, 3, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), null, "ASA Service", "ASA", null }
                 });
 
             migrationBuilder.InsertData(

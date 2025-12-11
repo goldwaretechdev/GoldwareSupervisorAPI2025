@@ -12,26 +12,32 @@ namespace GW.SupervisorPanelAPI.Controller
     [Route("api/[controller]/[action]" )]
     [ApiController]
     [Authorize("Development")]
-    public class DevelopmentController : ControllerBase
+    public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
         private readonly IBaseData _baseData;
         private readonly ISettingsService _settingsService;
+        private readonly IOwnerRepository _ownerRepository;
+        private readonly ISoftwareVersionRepository _softwareVersionRepository;
 
-        public DevelopmentController(IDeviceRepository deviceRepository,IBaseData baseData,ISettingsService settingsService)
+        public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
+            ,ISettingsService settingsService,IOwnerRepository ownerRepository
+            ,ISoftwareVersionRepository softwareVersion)
         {
             _deviceRepository = deviceRepository;
             _baseData = baseData;
             _settingsService = settingsService;
+            _ownerRepository = ownerRepository;
+            _softwareVersionRepository = softwareVersion;
         }
 
         #region BaseInfo
         [HttpGet]
-        public IActionResult BaseInfo()
+        public IActionResult Owners()
         {
             try
             {
-                var result = _settingsService.Info();
+                var result = _ownerRepository.Owners();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -41,7 +47,22 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-        //todo get softversions
+        #region SoftwareVersions
+        [HttpGet]
+        public IActionResult SoftwareVersions()
+        {
+            try
+            {
+                var result = _softwareVersionRepository.CategorizedVersions();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
 
         #region SetDeviceSettings
         [HttpPost]

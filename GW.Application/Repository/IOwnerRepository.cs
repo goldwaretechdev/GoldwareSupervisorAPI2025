@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using GW.Application.Sevices;
 using GW.Core.Context;
+using GW.Core.Models.Dto;
+using GW.Core.Models.Enum;
+using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,6 +17,8 @@ namespace GW.Application.Repository
     public interface IOwnerRepository
     {
         public List<SelectListItem> Owners();
+        //public Result<BaseInfo> Info();
+
     }
 
     public class OwnerRepository : IOwnerRepository
@@ -40,5 +45,32 @@ namespace GW.Application.Repository
                     Text= c.Name
                 }).ToList();
         }
+
+        //public Result<BaseInfo> Info()
+        //{
+        //    BaseInfo response = new();
+
+        //    response.DeviceTypes = Enum.GetValues(typeof(DeviceType))
+        //   .Cast<DeviceType>()
+        //   .Select(e => new SelectListItem
+        //   {
+        //       Value = Convert.ToInt32(e).ToString(),
+        //       Text = e.ToString()
+        //   })
+        //   .ToList();
+
+        //    response.ProductCategory = Enum.GetValues(typeof(ProductCategory))
+        //   .Cast<ProductCategory>()
+        //   .Select(e => new SelectListItem
+        //   {
+        //       Value = Convert.ToInt32(e).ToString(),
+        //       Text = e.ToString()
+        //   })
+        //   .ToList();
+        //    response.ProductOwner = Owners();
+
+        //    return Result<BaseInfo>.Ok(response);
+        //}
+
     }
 }

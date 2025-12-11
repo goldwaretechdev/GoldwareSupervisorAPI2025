@@ -15,6 +15,7 @@ namespace GW.Core.Models.Dto
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
+        public ProductCategory Category { get; set; }
         //todo category
         public string Path { get; set; }
 
@@ -28,8 +29,8 @@ namespace GW.Core.Models.Dto
 
     public class CategorizedVersions
     {
-        public List<ItemVersion> ESP { get; set; }
-        public List<ItemVersion> STM { get; set; }
-        public List<ItemVersion> Holtek { get; set; }
+        public List<ItemVersion> ESP { get; set; } = new();
+        public List<ItemVersion> STM { get; set; } = new();
+        public List<ItemVersion> Holtek { get; set; } = new();
     }
 }
