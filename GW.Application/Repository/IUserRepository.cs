@@ -8,6 +8,7 @@ using GW.Application.Sevices;
 using GW.Core.Context;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace GW.Application.Repository
 {
@@ -60,7 +61,8 @@ namespace GW.Application.Repository
             }
 
             if (!_context.UserRoles
-                 .Any(u => u.FkUserId == user.Id && u.FkRoleId == info.Role))
+                .Include(u=>u.Role)
+                 .Any(u => u.FkUserId == user.Id && u.Role.Name == info.Role))
                 return Result<string>.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
             var token = _baseData.GenerateToken(user.Id, info.Role);
             return Result<string>.Ok(token);

@@ -23,6 +23,6 @@ namespace GW.Core.Models.Dto
         public string UserName { get; set; }
         [MinLength(8)]
         public string Password { get; set; }
-        public int Role {  get; set; }
+        public string? Role {  get; set; }
     }
 }

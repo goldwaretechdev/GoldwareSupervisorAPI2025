@@ -1,4 +1,5 @@
 ﻿using GW.Core.Models;
+using GW.Core.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -191,7 +192,64 @@ namespace GW.Core.Context
                     Charge = 3,
                     CreatedOn = SeedDate,
                 }               
-                );
+            );
+
+            builder.Entity<SoftwareVersion>().HasData(
+                new SoftwareVersion()
+                {
+                    Id = 1,
+                    Version = "ESP01",
+                    Path = "",
+                    MicroType = MicroType.ESP,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                },
+                new SoftwareVersion()
+                {
+                    Id = 2,
+                    Version = "ESP02",
+                    Path = "",
+                    MicroType = MicroType.ESP,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                },
+                new SoftwareVersion()
+                {
+                    Id = 3,
+                    Version = "HT01",
+                    Path = "",
+                    MicroType = MicroType.Holtek,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                },
+                new SoftwareVersion()
+                {
+                    Id = 4,
+                    Version = "HT02",
+                    Path = "",
+                    MicroType = MicroType.Holtek,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                },
+                new SoftwareVersion()
+                {
+                    Id = 5,
+                    Version = "STM01",
+                    Path = "",
+                    MicroType = MicroType.STM,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                },
+                new SoftwareVersion()
+                {
+                    Id = 6,
+                    Version = "STM02",
+                    Path = "",
+                    MicroType = MicroType.STM,
+                    Category = ProductCategory.Lena,
+                    DeviceType = DeviceType.SWITCH
+                }
+            );
         }
     }
 

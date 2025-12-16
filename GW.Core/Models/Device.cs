@@ -12,9 +12,9 @@ namespace GW.Core.Models
         public DeviceType Type { get; set; }
         public ProductCategory ProductCategory { get; set; }
         [MaxLength(50)]
-        public string BatchNumber { get; set; }
+        public string? BatchNumber { get; set; }
         [MaxLength(50)]
-        public string SerialNumber { get; set; }
+        public string? SerialNumber { get; set; }
         public DateTime ProductionDate { get; set; }
         public DateTime LastUpdate { get; set; }
         [MaxLength(50)]

@@ -16,7 +16,7 @@ namespace GW.Application.Repository
 {
     public interface IOwnerRepository
     {
-        public List<SelectListItem> Owners();
+        public Result<List<ItemsListDto>> Owners();
         //public Result<BaseInfo> Info();
 
     }
@@ -35,15 +35,16 @@ namespace GW.Application.Repository
         }
 
 
-        public List<SelectListItem> Owners()
+        public Result<List<ItemsListDto>> Owners()
         {
-            return _context.Company
+            var result = _context.Company
                 .AsNoTracking()
-                .Select(c => new SelectListItem
+                .Select(c => new ItemsListDto
                 {
-                   Value=  c.Id.ToString(),
+                   Value=  c.Id,
                     Text= c.Name
                 }).ToList();
+            return Result<List<ItemsListDto>>.Ok(result);
         }
 
         //public Result<BaseInfo> Info()

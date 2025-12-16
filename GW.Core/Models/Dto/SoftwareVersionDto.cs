@@ -1,4 +1,5 @@
 ﻿using GW.Core.Models.Enum;
+using GW.Core.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,6 +22,12 @@ namespace GW.Core.Models.Dto
 
     }
 
+    public class RequestVersions
+    {
+        public DeviceType DeviceType { get; set; }
+        public ProductCategory Category { get; set; }
+    }
+
     public class ItemVersion
     {
         public int Id { get; set; }
@@ -29,8 +36,8 @@ namespace GW.Core.Models.Dto
 
     public class CategorizedVersions
     {
-        public List<ItemVersion> ESP { get; set; } = new();
-        public List<ItemVersion> STM { get; set; } = new();
-        public List<ItemVersion> Holtek { get; set; } = new();
+        public List<ItemsListDto> ESP { get; set; } = new();
+        public List<ItemsListDto> STM { get; set; } = new();
+        public List<ItemsListDto> Holtek { get; set; } = new();
     }
 }

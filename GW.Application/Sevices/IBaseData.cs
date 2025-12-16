@@ -15,7 +15,7 @@ namespace GW.Application.Sevices
     public interface IBaseData
     {
         public string HashMaker(string plain);
-        public string GenerateToken(Guid userId,int role);
+        public string GenerateToken(Guid userId,string role);
 
     }
 
@@ -39,7 +39,7 @@ namespace GW.Application.Sevices
         #endregion
 
         #region GenerateToken
-        public string GenerateToken(Guid userId, int role)
+        public string GenerateToken(Guid userId, string role)
         {
             
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:key"]));
@@ -49,7 +49,7 @@ namespace GW.Application.Sevices
             {
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // SignalR default lookup
                  new Claim("Identifier",userId.ToString()),               
-                  new Claim(ClaimTypes.Role,role.ToString())
+                  new Claim(ClaimTypes.Role,role)
             };
 
             var token = new JwtSecurityToken(_configuration["JwtSettings:Issuer"],

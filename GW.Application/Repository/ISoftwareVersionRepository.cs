@@ -14,7 +14,7 @@ namespace GW.Application.Repository
 {
     public interface ISoftwareVersionRepository
     {
-        public Result<CategorizedVersions> CategorizedVersions();
+        public Result<CategorizedVersions> CategorizedVersions(RequestVersions request);
     }
 
 
@@ -31,9 +31,10 @@ namespace GW.Application.Repository
             _baseData = baseData;
         }
 
-        public Result<CategorizedVersions> CategorizedVersions()
+        public Result<CategorizedVersions> CategorizedVersions(RequestVersions request)
         {
             var data = _context.SoftwareVersions
+                .Where(s=>s.Category==request.Category && s.DeviceType==request.DeviceType)
                 .Select(s=>new {s.Id,s.Version,s.MicroType})
                 .ToList();
             CategorizedVersions categorized = new();
@@ -42,13 +43,13 @@ namespace GW.Application.Repository
                 switch (item.MicroType)
                 {
                     case MicroType.Holtek:
-                        categorized.Holtek.Add(new() { Id = item.Id,Version =item.Version});
+                        categorized.Holtek.Add(new() { Value = item.Id,Text =item.Version});
                         break;
                     case MicroType.STM:
-                        categorized.STM.Add(new() { Id = item.Id, Version = item.Version });
+                        categorized.STM.Add(new() { Value = item.Id, Text = item.Version });
                         break;
                     case MicroType.ESP:
-                        categorized.ESP.Add(new() { Id = item.Id, Version = item.Version });
+                        categorized.ESP.Add(new() { Value = item.Id, Text = item.Version });
                         break;
                 }
             }

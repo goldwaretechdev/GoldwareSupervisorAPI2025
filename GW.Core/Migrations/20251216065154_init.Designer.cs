@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20251211090547_init")]
+    [Migration("20251216065154_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -110,7 +110,6 @@ namespace GW.Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BatchNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -153,7 +152,6 @@ namespace GW.Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SerialNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -345,6 +343,62 @@ namespace GW.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SoftwareVersions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 3,
+                            Path = "",
+                            Version = "ESP01"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 3,
+                            Path = "",
+                            Version = "ESP02"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 1,
+                            Path = "",
+                            Version = "HT01"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 1,
+                            Path = "",
+                            Version = "HT02"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 2,
+                            Path = "",
+                            Version = "STM01"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Category = 1,
+                            DeviceType = 1,
+                            MicroType = 2,
+                            Path = "",
+                            Version = "STM02"
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.Unit", b =>

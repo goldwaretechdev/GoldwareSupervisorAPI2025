@@ -35,9 +35,11 @@ namespace GW.Application.Repository
 
         public Result Insert(SettingDto setting)
         {
-            var check = _context.Devices
+            var check = !string.IsNullOrEmpty(setting.SerialNumber) ? _context.Devices
                 .AsNoTracking()
-                .Any(d=>d.SerialNumber==setting.SerialNumber);
+                .Any(d => d.SerialNumber == setting.SerialNumber) : _context.Devices
+                .AsNoTracking()
+                .Any(d => d.BatchNumber == setting.BatchNumber);
             if (check) 
                 return Result.Fail(ErrorCode.DUPLICATE_DATA, "سریال وارد شده قبلا ثبت شده است!");
             _context.Devices.Add(_mapper.Map<Device>(setting));

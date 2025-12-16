@@ -11,7 +11,7 @@ namespace GW.SupervisorPanelAPI.Controller
 {
     [Route("api/[controller]/[action]" )]
     [ApiController]
-    [Authorize("Development")]
+    [Authorize(Roles ="Development")]
     public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
@@ -31,7 +31,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _softwareVersionRepository = softwareVersion;
         }
 
-        #region BaseInfo
+        #region Owners
         [HttpGet]
         public IActionResult Owners()
         {
@@ -48,12 +48,12 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region SoftwareVersions
-        [HttpGet]
-        public IActionResult SoftwareVersions()
+        [HttpPost]
+        public IActionResult SoftwareVersions([FromBody]RequestVersions request)
         {
             try
             {
-                var result = _softwareVersionRepository.CategorizedVersions();
+                var result = _softwareVersionRepository.CategorizedVersions(request);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -62,7 +62,6 @@ namespace GW.SupervisorPanelAPI.Controller
             }
         }
         #endregion
-
 
         #region SetDeviceSettings
         [HttpPost]

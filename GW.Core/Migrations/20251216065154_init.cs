@@ -99,8 +99,8 @@ namespace GW.Core.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
                     ProductCategory = table.Column<int>(type: "int", nullable: false),
-                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -315,6 +315,19 @@ namespace GW.Core.Migrations
                     { 2, "Production" },
                     { 3, "Collaborators" },
                     { 4, "Support" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "SoftwareVersions",
+                columns: new[] { "Id", "Category", "DeviceType", "MicroType", "Path", "Version" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, 3, "", "ESP01" },
+                    { 2, 1, 1, 3, "", "ESP02" },
+                    { 3, 1, 1, 1, "", "HT01" },
+                    { 4, 1, 1, 1, "", "HT02" },
+                    { 5, 1, 1, 2, "", "STM01" },
+                    { 6, 1, 1, 2, "", "STM02" }
                 });
 
             migrationBuilder.InsertData(
