@@ -46,32 +46,6 @@ namespace GW.Application.Repository
                 }).ToList();
             return Result<List<ItemsListDto>>.Ok(result);
         }
-
-        //public Result<BaseInfo> Info()
-        //{
-        //    BaseInfo response = new();
-
-        //    response.DeviceTypes = Enum.GetValues(typeof(DeviceType))
-        //   .Cast<DeviceType>()
-        //   .Select(e => new SelectListItem
-        //   {
-        //       Value = Convert.ToInt32(e).ToString(),
-        //       Text = e.ToString()
-        //   })
-        //   .ToList();
-
-        //    response.ProductCategory = Enum.GetValues(typeof(ProductCategory))
-        //   .Cast<ProductCategory>()
-        //   .Select(e => new SelectListItem
-        //   {
-        //       Value = Convert.ToInt32(e).ToString(),
-        //       Text = e.ToString()
-        //   })
-        //   .ToList();
-        //    response.ProductOwner = Owners();
-
-        //    return Result<BaseInfo>.Ok(response);
-        //}
-
+       
     }
 }

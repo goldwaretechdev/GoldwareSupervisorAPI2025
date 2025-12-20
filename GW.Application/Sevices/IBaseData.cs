@@ -1,14 +1,8 @@
-﻿using GW.Core.Models.Dto;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GW.Application.Sevices
 {
@@ -16,7 +10,8 @@ namespace GW.Application.Sevices
     {
         public string HashMaker(string plain);
         public string GenerateToken(Guid userId,string role);
-
+        public Guid GetUserId(string token);
+        public string GetUserRole(string token);
     }
 
 
@@ -62,5 +57,28 @@ namespace GW.Application.Sevices
         }
         #endregion
 
+        #region GetUserId
+        public Guid GetUserId(string token)
+        {
+            var strToken = token.Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+
+            var jwtSecurityToken = handler.ReadJwtToken(strToken);
+            var tokenS = jwtSecurityToken as JwtSecurityToken;
+            return Guid.Parse(tokenS.Claims.FirstOrDefault(claim => claim.Type == "Identifier").Value);
+        }
+        #endregion
+
+        #region GetUserRole
+        public string GetUserRole(string token)
+        {
+            var strToken = token.Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+
+            var jwtSecurityToken = handler.ReadJwtToken(strToken);
+            var tokenS = jwtSecurityToken as JwtSecurityToken;
+            return tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role).Value;
+        }
+        #endregion
     }
 }

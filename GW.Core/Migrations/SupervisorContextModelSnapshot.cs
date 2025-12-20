@@ -252,7 +252,6 @@ namespace GW.Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Desc")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -260,6 +259,9 @@ namespace GW.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("FkUserRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

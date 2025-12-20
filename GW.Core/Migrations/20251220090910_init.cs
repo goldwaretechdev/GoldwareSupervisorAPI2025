@@ -276,7 +276,8 @@ namespace GW.Core.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Desc = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Desc = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     FkDeviceId = table.Column<int>(type: "int", nullable: false),
                     FkUserRoleId = table.Column<int>(type: "int", nullable: false)
                 },

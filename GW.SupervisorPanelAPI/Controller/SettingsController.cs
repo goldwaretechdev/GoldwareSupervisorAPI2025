@@ -6,6 +6,7 @@ using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace GW.SupervisorPanelAPI.Controller
 {
@@ -15,6 +16,7 @@ namespace GW.SupervisorPanelAPI.Controller
     public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IBaseData _baseData;
         private readonly ISettingsService _settingsService;
         private readonly IOwnerRepository _ownerRepository;
@@ -22,9 +24,10 @@ namespace GW.SupervisorPanelAPI.Controller
 
         public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
             ,ISettingsService settingsService,IOwnerRepository ownerRepository
-            ,ISoftwareVersionRepository softwareVersion)
+            ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository)
         {
             _deviceRepository = deviceRepository;
+            _userRepository = userRepository;
             _baseData = baseData;
             _settingsService = settingsService;
             _ownerRepository = ownerRepository;
@@ -69,7 +72,13 @@ namespace GW.SupervisorPanelAPI.Controller
         {
             try
             {
-                var result = _deviceRepository.Insert(request);
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var data = _userRepository.UserRole(userId, role);
+                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
+                var userRole = data.Data;
+                var result = _deviceRepository.Insert(request,userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)

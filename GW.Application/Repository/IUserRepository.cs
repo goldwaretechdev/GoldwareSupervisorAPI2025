@@ -16,6 +16,7 @@ namespace GW.Application.Repository
     {
         public Result<List<RoleDto>> Login(LoginInfo info);
         public Result<string> Token(LoginInfo info);
+        public Result<UserRoleDto> UserRole(Guid userId,string role);
     }
 
     public class UserRepository : IUserRepository
@@ -31,6 +32,7 @@ namespace GW.Application.Repository
             _baseData = baseData;
         }
 
+        #region Login
         public Result<List<RoleDto>> Login(LoginInfo info)
         {
             var user = _context.Users.Where(u=>u.Username==info.UserName ).FirstOrDefault();
@@ -49,8 +51,9 @@ namespace GW.Application.Repository
 
             return Result<List<RoleDto>>.Ok(roles);
         }
+        #endregion
 
-
+        #region Token
         public Result<string> Token(LoginInfo info)
         {
             var user = _context.Users.Where(u => u.Username == info.UserName).FirstOrDefault();
@@ -67,5 +70,20 @@ namespace GW.Application.Repository
             var token = _baseData.GenerateToken(user.Id, info.Role);
             return Result<string>.Ok(token);
         }
+        #endregion
+
+        #region UserRole
+        public Result<UserRoleDto> UserRole(Guid userId, string role)
+        {
+            var userRole = _context.UserRoles
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == role && u.FkUserId == userId)
+                .FirstOrDefault();
+            if (userRole is null) return Result<UserRoleDto>.Fail(ErrorCode.NOT_FOUND, "کاربری با این مشخصات وجود ندارد!");
+            var result = _mapper.Map<UserRoleDto>(userRole);
+            return Result<UserRoleDto>.Ok(result);
+        }
+        #endregion
     }
 }

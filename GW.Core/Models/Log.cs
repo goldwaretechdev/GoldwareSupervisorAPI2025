@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GW.Core.Models.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace GW.Core.Models
         public int Id { get; set; }
         public DateTime DateTime { get; set; }
         [MaxLength(150)]
-        public string Desc { get; set; }
-
+        public string? Desc { get; set; }
+        public LogType Type { get; set; }
         public Device Device { get; set; }
         public int FkDeviceId { get; set; }
 
