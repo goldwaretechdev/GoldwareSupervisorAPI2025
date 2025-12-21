@@ -104,5 +104,21 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
+        #region GetSettings
+        [HttpPost]
+        public IActionResult GetSettings([FromBody] string serial)
+        {
+            try
+            {
+                var result = _deviceRepository.GetSettings(serial);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+            }
+        }
+        #endregion
+
     }
 }

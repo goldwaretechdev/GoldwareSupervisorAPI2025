@@ -18,6 +18,7 @@ namespace GW.Application.Repository
     {
         public Result Insert(SettingDto setting,int userRoleId);
         public Result Update(SettingDto setting);
+        public Result<SettingDto> GetSettings(string serial);
     }
 
     public class DeviceRepository : IDeviceRepository
@@ -78,7 +79,7 @@ namespace GW.Application.Repository
                 .Where(d=>d.SerialNumber==setting.SerialNumber)
                 .FirstOrDefault();
             if (check is null)
-                return Result.Fail(ErrorCode.DUPLICATE_DATA, "سریال وارد شده صحیح نیست!");
+                return Result.Fail(ErrorCode.NOT_FOUND, "سریال وارد شده صحیح نیست!");
 
             check.ProductCategory= setting.ProductCategory;
             check.FkOwnerId= setting.FkOwnerId;
@@ -96,6 +97,25 @@ namespace GW.Application.Repository
             _context.Devices.Update(_mapper.Map<Device>(check));
             _context.SaveChanges();
             return Result.Ok();
+        }
+        #endregion
+
+        #region GetSettings
+        public Result<SettingDto> GetSettings(string serial)
+        {
+            SettingDto result = new();
+            var check = _context.Devices
+                .AsNoTracking()
+                .Include(d=>d.ProductOwner)
+                .Include(d=>d.STM)
+                .Include(d=>d.ESP)
+                .Include(d=>d.Holtek)
+                .Where(d=>d.SerialNumber==serial)
+                .FirstOrDefault();
+            if (check is null)
+                return Result<SettingDto>.Fail(ErrorCode.NOT_FOUND, "سریال وارد شده صحیح نیست!");
+           result = _mapper.Map<SettingDto>(check); 
+            return Result<SettingDto>.Ok(result);
         }
         #endregion
     }
