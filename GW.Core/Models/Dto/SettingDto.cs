@@ -1,4 +1,5 @@
 ﻿using GW.Core.Models.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,8 +33,9 @@ namespace GW.Core.Models.Dto
         public string HoltekVersion { get; set; }                                    //116
     }
 
-    //public class UpdateDeviceSettings:SettingDto
-    //{
-    //    public int Id { get; set; }
-    //}
+    public class UpdateFOTARequest
+    {
+        public SettingDto Settings { get; set; }
+        public IFormFile File { get; set; }
+    }
 }

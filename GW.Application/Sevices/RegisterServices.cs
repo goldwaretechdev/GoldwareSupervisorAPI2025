@@ -19,6 +19,7 @@ namespace GW.Application.Sevices
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<ISoftwareVersionRepository, SoftwareRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
+            services.AddScoped<IFOTARepository, FOTARepository>();
 
 
             services.AddAutoMapper(typeof(RoleProfile).Assembly);

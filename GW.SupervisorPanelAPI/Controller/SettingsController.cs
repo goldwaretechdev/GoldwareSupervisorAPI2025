@@ -16,6 +16,7 @@ namespace GW.SupervisorPanelAPI.Controller
     public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IFOTARepository _fotaRepository;
         private readonly IUserRepository _userRepository;
         private readonly IBaseData _baseData;
         private readonly ISettingsService _settingsService;
@@ -24,7 +25,8 @@ namespace GW.SupervisorPanelAPI.Controller
 
         public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
             ,ISettingsService settingsService,IOwnerRepository ownerRepository
-            ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository)
+            ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository
+            ,IFOTARepository fOTARepository)
         {
             _deviceRepository = deviceRepository;
             _userRepository = userRepository;
@@ -32,6 +34,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _settingsService = settingsService;
             _ownerRepository = ownerRepository;
             _softwareVersionRepository = softwareVersion;
+            _fotaRepository = fOTARepository;
         }
 
         #region Owners
@@ -116,6 +119,22 @@ namespace GW.SupervisorPanelAPI.Controller
             catch (Exception ex)
             {
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+            }
+        }
+        #endregion
+
+        #region FOTA
+        [HttpPost]
+        public IActionResult FOTA([FromBody] UpdateFOTARequest request)
+        {
+            try
+            {
+                var result = _fotaRepository.Insert(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
         #endregion
