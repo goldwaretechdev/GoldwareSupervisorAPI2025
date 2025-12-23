@@ -35,7 +35,7 @@ namespace GW.Core.Models.Dto
 
     public class UpdateFOTARequest
     {
-        public SettingDto Settings { get; set; }
+        public string Settings { get; set; }
         public IFormFile File { get; set; }
     }
 }

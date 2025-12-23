@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using GW.Application.Repository;
 using GW.Application.Sevices;
+using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -125,11 +126,15 @@ namespace GW.SupervisorPanelAPI.Controller
 
         #region FOTA
         [HttpPost]
-        public IActionResult FOTA([FromBody] UpdateFOTARequest request)
+        public async Task<IActionResult> FOTA([FromForm] UpdateFOTARequest request)
         {
             try
             {
-                var result = _fotaRepository.Insert(request);
+                if (string.IsNullOrEmpty(request.Settings))
+                    return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
+                if (request.File == null || request.File.Length == 0)
+                    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
+                var result =await _fotaRepository.InsertAsync(request);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -137,7 +142,6 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
-        #endregion
-
+        #endregion       
     }
 }

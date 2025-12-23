@@ -151,7 +151,7 @@ namespace GW.Core.Migrations
                     ProductCategory = table.Column<int>(type: "int", nullable: true),
                     BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ExpireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),

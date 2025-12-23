@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20251220090910_init")]
+    [Migration("20251223091813_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -183,7 +183,7 @@ namespace GW.Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("ExpireDate")
+                    b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("FkESPId")
