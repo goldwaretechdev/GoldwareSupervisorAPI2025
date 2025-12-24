@@ -31,23 +31,20 @@ namespace GW.SupervisorPanelAPI.Controller
         }
 
         #region CheckFOTA
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> CheckFOTA([FromBody] string request)
         {
             try
             {
                 var setting = _baseData.ConvertStringToSettings(request);
-                if (await _fotaRepository.Check(setting)) return Ok(Result<string>.Ok(Constants.NO_DATA));
+                var path = _fotaRepository.Check(setting);
+                if (string.IsNullOrEmpty(path)) return Ok(Result<string>.Ok(Constants.NO_DATA));
 
-                //  Check lock
-                if (_cache.TryGetValue(Constants.FOTA_URL_IDENTITY.ToString(), out _))
-                {
-                    return Ok(Result<string>.Ok(ErrorCode.ACTION_LOCKED));
-                }
                 //change url id
                 Constants.FOTA_URL_IDENTITY = Guid.NewGuid();
-                // Lock for 5 minutes
-                _cache.Set(Constants.FOTA_URL_IDENTITY.ToString(), true, TimeSpan.FromMinutes(5));
+
+                // access for 5 minutes
+                _cache.Set(Constants.FOTA_URL_IDENTITY.ToString(), path, TimeSpan.FromMinutes(Constants.FOTA_TIMER));
                 return Ok(Result<string>.Ok(Constants.FOTA_URL_IDENTITY.ToString()));
             }
             catch (Exception ex)
@@ -58,18 +55,28 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region GetFOTA
-        [HttpPost("/{route}")]
-        public IActionResult FOTA(Guid route)
+        [HttpPost("[action]/{route}")]
+        public IActionResult FOTA(string route)
         {
             try
             {
-
-                return Ok();
+                //  Check access
+                var path = _cache.Get(route);
+                if (string.IsNullOrEmpty((string?)path))
+                {
+                    return BadRequest(ErrorCode.NO_CONTENT);
+                }
+                else
+                {
+                    if (!System.IO.File.Exists((string?)path))
+                        return NotFound();
+                    string fileName = path.ToString().Split("\\").Last();
+                    return PhysicalFile((string)path, "application/octet-stream", fileName);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                return BadRequest(ErrorCode.INTERNAL_ERROR);
             }
         }
         #endregion

@@ -17,7 +17,7 @@ namespace GW.Core.Models.Dto
         public string? BatchNumber { get; set; }
         [MaxLength(50)]
         public string? SerialNumber { get; set; }
-        public DateTime ExpireDate { get; set; }
+        public DateTime? ExpireDate { get; set; }
         public DateTime? ProductionDate { get; set; }
         public DateTime? LastUpdate { get; set; }
         [MaxLength(50)]

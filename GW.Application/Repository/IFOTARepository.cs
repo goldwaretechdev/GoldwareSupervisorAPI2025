@@ -4,6 +4,7 @@ using GW.Core.Context;
 using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace GW.Application.Repository
     public interface IFOTARepository
     {
         public Task<Result> InsertAsync(UpdateFOTARequest fota);
-        public Task<bool> Check(SettingDto setting);
+        public string Check(SettingDto setting);
     }
 
     public class FOTARepository : IFOTARepository
@@ -42,9 +43,25 @@ namespace GW.Application.Repository
             var path = await _baseData.PutFileAsync(fota.File);
             if (!string.IsNullOrEmpty(path))
             {
-                FOTA fota_settings = _mapper.Map<FOTA>(setting);
-                fota_settings.Path = path;
-                
+                //FOTA fota_settings = _mapper.Map<FOTA>(setting);
+                FOTA fota_settings = new()
+                {
+                    BatchNumber=setting.BatchNumber,
+                    SerialNumber=setting.SerialNumber,
+                    IMEI=setting.IMEI,
+                    MAC=setting.MAC,
+                    ExpireDate=setting.ExpireDate,
+                    ProductCategory=setting.ProductCategory,
+                    Type=setting.Type,
+                    ProductionDate=setting.ProductionDate,
+                    LastUpdate=setting.LastUpdate,
+                    FkESPId=setting.FkESPId,
+                    FkHoltekId=setting.FkHoltekId,
+                    FkOwnerId=setting.FkOwnerId,
+                    FkSTMId=setting.FkSTMId,
+                    HardwareVersion=setting.HardwareVersion,
+                    Path=path,
+                };               
                 _context.FOTA.Add(fota_settings);
                 _context.SaveChanges();
                 return Result.Ok();
@@ -54,23 +71,39 @@ namespace GW.Application.Repository
         #endregion
 
         #region Check
-        public async Task<bool> Check(SettingDto setting)
+        public string Check(SettingDto setting)
         {
-            return _context.FOTA
-                .Any(f => f.Type == setting.Type
-                && f.ProductCategory == setting.ProductCategory
-                && f.ProductionDate.GetValueOrDefault().Date == setting.ProductionDate.Date
-                && f.LastUpdate.GetValueOrDefault().Date == setting.LastUpdate.Date
-                && f.FkOwnerId == setting.FkOwnerId
-                && f.FkESPId == setting.FkESPId
-                && f.FkHoltekId == setting.FkHoltekId
-                && f.FkSTMId == setting.FkSTMId
-                && f.BatchNumber == setting.BatchNumber
-                && f.SerialNumber == setting.SerialNumber
-                && f.IMEI == setting.IMEI
-                && f.MAC == setting.MAC
-                && f.HardwareVersion == setting.HardwareVersion);
+            var prodDate = setting.ProductionDate.Date;
+            var prodDateEnd = prodDate.AddDays(1);
+
+            var lastUpdate = setting.LastUpdate.Date;
+            var lastUpdateEnd = lastUpdate.AddDays(1);
+
+            var fota = _context.FOTA
+                .Where(f =>
+                    f.Type == setting.Type &&
+                    f.ProductCategory == setting.ProductCategory &&
+                    f.FkOwnerId == setting.FkOwnerId &&
+                    f.FkESPId == setting.FkESPId &&
+                    f.FkHoltekId == setting.FkHoltekId &&
+                    f.FkSTMId == setting.FkSTMId &&
+                    f.BatchNumber == setting.BatchNumber &&
+                    f.SerialNumber == setting.SerialNumber &&
+                    f.IMEI == setting.IMEI &&
+                    f.MAC == setting.MAC &&
+                    f.HardwareVersion == setting.HardwareVersion
+                )
+                .FirstOrDefault();
+            if (fota is not null)
+            {
+                if (fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.Date
+                && fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.Date)
+                    return string.Empty;
+            }
+            else { return string.Empty; }
+            return fota.Path ?? string.Empty;
         }
+
         #endregion
     }
 }

@@ -119,8 +119,8 @@ namespace GW.Application.Sevices
         public SettingDto ConvertStringToSettings(string setting)
         {
             SettingDto settingDto = new();
-            var all = setting.Split('#');
-            var items = all.FirstOrDefault()?.Split('*');
+            var all = setting.Replace("#", string.Empty);
+            var items = all.Split('*');
             foreach (var item in items)
             {
                 var code = item.Split('=');
@@ -148,15 +148,15 @@ namespace GW.Application.Sevices
                         settingDto.SerialNumber = code[1].Trim();
                         break;
                     case "104":
-                        if (DateTime.TryParse(code[1].Trim(), out DateTime date))
+                        if (!string.IsNullOrEmpty(code[1]))
                         {
-                            settingDto.ProductionDate = date;
+                            settingDto.ProductionDate = DateTime.Parse(code[1]);
                         }
                         break;
                     case "105":
-                        if (DateTime.TryParse(code[1].Trim(), out DateTime last))
+                        if (!string.IsNullOrEmpty(code[1]))
                         {
-                            settingDto.LastUpdate = last;
+                            settingDto.LastUpdate = DateTime.Parse(code[1]);
                         }
                         break;
                     case "106":
