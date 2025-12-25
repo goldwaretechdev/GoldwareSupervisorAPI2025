@@ -18,7 +18,10 @@ namespace GW.Core.Models
         public DeviceType DeviceType { get; set; }
         public ProductCategory Category { get; set; }
         public string Path { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
 
+        public UserRoles UserRoles { get; set; }
+        public int FkUserRoleId { get; set; }
 
         public ICollection<Device> ESPVersions { get; set; }
         public ICollection<Device> STMVersions { get; set; }

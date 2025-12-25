@@ -30,9 +30,9 @@ namespace GW.SupervisorPanelAPI.Controller
             _cache = memoryCache;
         }
 
-        #region CheckFOTA
+        #region Check
         [HttpPost("[action]")]
-        public async Task<IActionResult> CheckFOTA([FromBody] string request)
+        public async Task<IActionResult> Check([FromBody] string request)
         {
             try
             {
@@ -54,9 +54,9 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-        #region GetFOTA
+        #region File
         [HttpPost("[action]/{route}")]
-        public IActionResult FOTA(string route)
+        public IActionResult File(string route)
         {
             try
             {

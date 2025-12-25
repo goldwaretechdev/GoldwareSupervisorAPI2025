@@ -18,7 +18,7 @@ namespace GW.Application.Sevices
         public Guid GetUserId(string token);
         public string GetUserRole(string token);
         public Task<string> PutFileAsync(IFormFile file);
-        public SettingDto ConvertStringToSettings(string setting);
+        public FOTADto ConvertStringToSettings(string setting);
 
     }
 
@@ -116,9 +116,9 @@ namespace GW.Application.Sevices
         #endregion
 
         #region ConvertObjToString
-        public SettingDto ConvertStringToSettings(string setting)
+        public FOTADto ConvertStringToSettings(string setting)
         {
-            SettingDto settingDto = new();
+            FOTADto settingDto = new();
             var all = setting.Replace("#", string.Empty);
             var items = all.Split('*');
             foreach (var item in items)
@@ -172,25 +172,25 @@ namespace GW.Application.Sevices
                         settingDto.FkOwnerId = int.Parse(code[1].Trim());
                         break;
                     case "110":
-                        settingDto.OwnerName = code[1].Trim();
+                        //settingDto.OwnerName = code[1].Trim();
                         break;
                     case "111":
-                        settingDto.FkESPId = int.Parse(code[1].Trim());
+                        settingDto.FkESPId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
                         break;
                     case "112":
-                        settingDto.ESPVersion = code[1].Trim();
+                        //settingDto.ESPVersion = code[1].Trim();
                         break;
                     case "113":
-                        settingDto.FkSTMId = int.Parse(code[1].Trim());
+                        settingDto.FkSTMId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
                         break;
                     case "114":
-                        settingDto.STMVersion = code[1].Trim();
+                        //settingDto.STMVersion = code[1].Trim();
                         break;
                     case "115":
-                        settingDto.FkHoltekId = int.Parse(code[1].Trim());
+                        settingDto.FkHoltekId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
                         break;
                     case "116":
-                        settingDto.HoltekVersion = code[1].Trim();
+                        //settingDto.HoltekVersion = code[1].Trim();
                         break;
                 }
             }

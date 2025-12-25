@@ -24,6 +24,7 @@ namespace GW.SupervisorPanelAPI.Controller
         private readonly IOwnerRepository _ownerRepository;
         private readonly ISoftwareVersionRepository _softwareVersionRepository;
 
+        #region ctor
         public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
             ,ISettingsService settingsService,IOwnerRepository ownerRepository
             ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository
@@ -37,6 +38,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _softwareVersionRepository = softwareVersion;
             _fotaRepository = fOTARepository;
         }
+        #endregion
 
         #region Owners
         [HttpGet]
@@ -62,6 +64,46 @@ namespace GW.SupervisorPanelAPI.Controller
             {
                 var result = _softwareVersionRepository.CategorizedVersions(request);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
+        #region SoftwareFile 
+        [HttpPost]
+        public IActionResult SoftwareFile([FromBody]int request)
+        {
+            try
+            {
+                var path = _softwareVersionRepository.File(request);
+                if (string.IsNullOrEmpty(path))
+                {
+                    return BadRequest(ErrorCode.NO_CONTENT);
+                }
+                else
+                {
+                    if (!System.IO.File.Exists(path))
+                        return NotFound();
+                    string fileName = path.ToString().Split("\\").Last();
+
+                    var file = PhysicalFile(path, "application/octet-stream", fileName);
+                    var stream = new FileStream(
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read
+                    );
+
+                    return File(
+                        stream,
+                        file.ContentType,
+                        file.FileName
+                    );
+
+                }
             }
             catch (Exception ex)
             {
@@ -134,7 +176,44 @@ namespace GW.SupervisorPanelAPI.Controller
                     return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
                 if (request.File == null || request.File.Length == 0)
                     return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
-                var result =await _fotaRepository.InsertAsync(request);
+
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var data = _userRepository.UserRole(userId, role);
+                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
+                var userRole = data.Data;
+
+
+                var result =await _fotaRepository.InsertAsync(request,userRole.Id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
+        #region UploadSoftware
+        [HttpPost]
+        public async Task<IActionResult> UploadSoftware([FromForm] UploadSoftwareVersion version, [FromForm]IFormFile file)
+        {
+            try
+            {
+                if (version is null)
+                    return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
+                if (file == null || file.Length == 0)
+                    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
+
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var data = _userRepository.UserRole(userId, role);
+                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
+                var userRole = data.Data;
+
+                var result =_softwareVersionRepository.Insert(version,file,userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)

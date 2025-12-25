@@ -24,5 +24,6 @@ namespace GW.Core.Models
         public ICollection<UserAndCompany> UserAndCompanies { get; set; }
         public ICollection<Access> Access { get; set; }
 
+
     }
 }

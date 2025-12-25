@@ -16,8 +16,8 @@ namespace GW.Application.Repository
 {
     public interface IFOTARepository
     {
-        public Task<Result> InsertAsync(UpdateFOTARequest fota);
-        public string Check(SettingDto setting);
+        public Task<Result> InsertAsync(UpdateFOTARequest fota,int userRole);
+        public string Check(FOTADto setting);
     }
 
     public class FOTARepository : IFOTARepository
@@ -37,7 +37,7 @@ namespace GW.Application.Repository
         #endregion
 
         #region Insert
-        public async Task<Result> InsertAsync(UpdateFOTARequest fota)
+        public async Task<Result> InsertAsync(UpdateFOTARequest fota,int userRole)
         {           
             var setting = JsonConvert.DeserializeObject<FOTADto>(fota.Settings);
             var path = await _baseData.PutFileAsync(fota.File);
@@ -61,6 +61,7 @@ namespace GW.Application.Repository
                     FkSTMId=setting.FkSTMId,
                     HardwareVersion=setting.HardwareVersion,
                     Path=path,
+                    FkUserRoleId = userRole
                 };               
                 _context.FOTA.Add(fota_settings);
                 _context.SaveChanges();
@@ -71,14 +72,8 @@ namespace GW.Application.Repository
         #endregion
 
         #region Check
-        public string Check(SettingDto setting)
+        public string Check(FOTADto setting)
         {
-            var prodDate = setting.ProductionDate.Date;
-            var prodDateEnd = prodDate.AddDays(1);
-
-            var lastUpdate = setting.LastUpdate.Date;
-            var lastUpdateEnd = lastUpdate.AddDays(1);
-
             var fota = _context.FOTA
                 .Where(f =>
                     f.Type == setting.Type &&
@@ -91,13 +86,13 @@ namespace GW.Application.Repository
                     f.SerialNumber == setting.SerialNumber &&
                     f.IMEI == setting.IMEI &&
                     f.MAC == setting.MAC &&
-                    f.HardwareVersion == setting.HardwareVersion
+                    f.HardwareVersion == setting.HardwareVersion,
                 )
                 .FirstOrDefault();
             if (fota is not null)
             {
-                if (fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.Date
-                && fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.Date)
+                if (fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.GetValueOrDefault().Date
+                && fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.GetValueOrDefault().Date)
                     return string.Empty;
             }
             else { return string.Empty; }

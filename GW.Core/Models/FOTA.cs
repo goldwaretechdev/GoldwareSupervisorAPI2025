@@ -22,6 +22,7 @@ namespace GW.Core.Models
         public DateTime? ExpireDate { get; set; }
         public DateTime? ProductionDate { get; set; }
         public DateTime? LastUpdate { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
         [MaxLength(50)]
         public string? HardwareVersion { get; set; }
         [MaxLength(50)]
@@ -40,5 +41,8 @@ namespace GW.Core.Models
 
         public SoftwareVersion? Holtek { get; set; }
         public int? FkHoltekId { get; set; }
+
+        public UserRoles UserRoles { get; set; }
+        public int FkUserRoleId { get; set; }
     }
 }

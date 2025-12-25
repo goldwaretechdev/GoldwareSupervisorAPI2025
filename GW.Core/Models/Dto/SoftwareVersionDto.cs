@@ -22,6 +22,15 @@ namespace GW.Core.Models.Dto
 
     }
 
+    public class UploadSoftwareVersion
+    {
+        [MaxLength(50)]
+        public string Version { get; set; }
+        public MicroType MicroType { get; set; }
+        public DeviceType DeviceType { get; set; }
+        public ProductCategory Category { get; set; }
+    }
+
     public class RequestVersions
     {
         public DeviceType DeviceType { get; set; }

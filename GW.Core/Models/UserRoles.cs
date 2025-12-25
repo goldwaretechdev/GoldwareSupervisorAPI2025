@@ -16,5 +16,7 @@ namespace GW.Core.Models
         public int FkRoleId { get; set; }
 
         public ICollection<Log> Logs{ get; set; }
+        public ICollection<SoftwareVersion> SoftwareVersions { get; set; }
+        public ICollection<FOTA> FOTAs { get; set; }
     }
 }
