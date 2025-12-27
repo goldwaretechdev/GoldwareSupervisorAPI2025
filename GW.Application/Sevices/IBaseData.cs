@@ -17,7 +17,7 @@ namespace GW.Application.Sevices
         public string GenerateToken(Guid userId,string role);
         public Guid GetUserId(string token);
         public string GetUserRole(string token);
-        public Task<string> PutFileAsync(IFormFile file);
+        public Task<string> PutFileAsync(IFormFile file,string type);
         public FOTADto ConvertStringToSettings(string setting);
 
     }
@@ -90,15 +90,25 @@ namespace GW.Application.Sevices
         #endregion
 
         #region PutFile
-        public async Task<string> PutFileAsync(IFormFile file)
+        public async Task<string> PutFileAsync(IFormFile file,string type)
         {
             try
             {
                 //string name = fota.File.FileName;
                 string name = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                 //imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(fileName.FileName);
-                var filePath = Path.Combine("C:\\", Constants.GW_FOTA_DIRECTORY, name);
-                var directory = "C:\\" + Constants.GW_FOTA_DIRECTORY;
+                var filePath = type switch
+                {
+                    "fota" => Path.Combine("C:\\", Constants.GW_FOTA_DIRECTORY, name),
+                    "soft" => Path.Combine("C:\\", Constants.GW_SOFTWARE_DIRECTORY, name),
+                    _ => throw new Exception(ErrorCode.NOT_FOUND),
+                };
+                var directory = type switch
+                {
+                    "fota" => "C:\\" + Constants.GW_FOTA_DIRECTORY,
+                    "soft" => "C:\\" + Constants.GW_SOFTWARE_DIRECTORY,
+                    _ => throw new Exception(ErrorCode.NOT_FOUND),
+                };
                 if (!Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
@@ -107,7 +117,7 @@ namespace GW.Application.Sevices
                 {
                     await file.CopyToAsync(fileStream);
                 }
-                return directory+"\\"+name;
+                return filePath;
             }catch
             {
                 return string.Empty;

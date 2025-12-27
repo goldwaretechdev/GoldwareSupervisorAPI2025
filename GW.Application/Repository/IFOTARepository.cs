@@ -40,7 +40,7 @@ namespace GW.Application.Repository
         public async Task<Result> InsertAsync(UpdateFOTARequest fota,int userRole)
         {           
             var setting = JsonConvert.DeserializeObject<FOTADto>(fota.Settings);
-            var path = await _baseData.PutFileAsync(fota.File);
+            var path = await _baseData.PutFileAsync(fota.File,Constants.FOTA_FILE);
             if (!string.IsNullOrEmpty(path))
             {
                 //FOTA fota_settings = _mapper.Map<FOTA>(setting);
@@ -86,7 +86,7 @@ namespace GW.Application.Repository
                     f.SerialNumber == setting.SerialNumber &&
                     f.IMEI == setting.IMEI &&
                     f.MAC == setting.MAC &&
-                    f.HardwareVersion == setting.HardwareVersion,
+                    f.HardwareVersion == setting.HardwareVersion
                 )
                 .FirstOrDefault();
             if (fota is not null)

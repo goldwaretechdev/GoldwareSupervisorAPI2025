@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using GW.Application.Sevices;
 using GW.Core.Context;
+using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Enum;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace GW.Application.Repository
     {
         public Result<CategorizedVersions> CategorizedVersions(RequestVersions request);
         public string File(int id);
-        public Result Insert(UploadSoftwareVersion version,IFormFile file,int userRoleId);
+        public Task<Result> Insert(UploadSoftwareVersion version,int userRoleId);
     }
 
 
@@ -77,9 +79,33 @@ namespace GW.Application.Repository
         #endregion
 
         #region Insert
-        public Result Insert(UploadSoftwareVersion version, IFormFile file, int userRoleId)
+        public async Task<Result> Insert(UploadSoftwareVersion version, int userRoleId)
         {
-            return Result.Ok();
+            var condition = JsonConvert.DeserializeObject<VersionConditions>(version.Condition);
+            if (_context.SoftwareVersions
+                .Any(s => s.DeviceType == condition.DeviceType
+                && s.Category == condition.Category
+                && s.MicroType == condition.MicroType
+                && s.Version == condition.Version))
+                return Result.Fail(ErrorCode.DUPLICATE_DATA, "ورژن وارد شده تکراری می باشد!");
+            var path = await _baseData.PutFileAsync(version.File,Constants.SOFT_FILE);
+            if (!string.IsNullOrEmpty(path))
+            {
+                SoftwareVersion softwareVersion = new()
+                {
+                    DeviceType=condition.DeviceType,
+                    Category = condition.Category,
+                    MicroType = condition.MicroType,
+                    DateTime = DateTime.Now,
+                    Version =condition.Version,
+                    Path = path,
+                    FkUserRoleId = userRoleId
+                };
+                _context.SoftwareVersions.Add(softwareVersion);
+                _context.SaveChanges();
+                return Result.Ok();
+            }
+            return Result.Fail(ErrorCode.NO_FILE_UPLOADED, "خطا در آپلود فایل!");
         }
 
         #endregion

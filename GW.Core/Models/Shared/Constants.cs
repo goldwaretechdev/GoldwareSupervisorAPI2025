@@ -8,10 +8,13 @@ namespace GW.Core.Models.Shared
 {
     public static class Constants
     {
-        public static readonly string GW_FOTA_DIRECTORY = "GW_FOTA_DIRECTORY";
+        public static readonly string GW_FOTA_DIRECTORY = "GW_Files\\GW_FOTA_DIRECTORY";
+        public static readonly string GW_SOFTWARE_DIRECTORY = "GW_Files\\GW_SOFTWARE_DIRECTORY";
         public static string NO_DATA = "NO_DATA";
         public static Guid FOTA_URL_IDENTITY = Guid.NewGuid();
-        public static int FOTA_TIMER = 5;
+        public static int FOTA_TIMER = 10;
+        public static string FOTA_FILE = "fota";
+        public static string SOFT_FILE = "soft";
     }
 
     public static class ErrorCode

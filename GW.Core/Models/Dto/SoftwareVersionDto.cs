@@ -1,5 +1,6 @@
 ﻿using GW.Core.Models.Enum;
 using GW.Core.Models.Shared;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,6 +24,11 @@ namespace GW.Core.Models.Dto
     }
 
     public class UploadSoftwareVersion
+    {
+        public string Condition { get; set; }
+        public IFormFile File { get; set; }
+    }
+    public class VersionConditions
     {
         [MaxLength(50)]
         public string Version { get; set; }

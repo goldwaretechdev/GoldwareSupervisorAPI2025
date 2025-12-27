@@ -45,23 +45,6 @@ namespace GW.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SoftwareVersions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Version = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MicroType = table.Column<int>(type: "int", nullable: false),
-                    DeviceType = table.Column<int>(type: "int", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SoftwareVersions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Units",
                 columns: table => new
                 {
@@ -88,107 +71,6 @@ namespace GW.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Devices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    ProductCategory = table.Column<int>(type: "int", nullable: false),
-                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    FkOwnerId = table.Column<int>(type: "int", nullable: false),
-                    FkESPId = table.Column<int>(type: "int", nullable: false),
-                    FkSTMId = table.Column<int>(type: "int", nullable: false),
-                    FkHoltekId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Devices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Devices_Company_FkOwnerId",
-                        column: x => x.FkOwnerId,
-                        principalTable: "Company",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Devices_SoftwareVersions_FkESPId",
-                        column: x => x.FkESPId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Devices_SoftwareVersions_FkHoltekId",
-                        column: x => x.FkHoltekId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Devices_SoftwareVersions_FkSTMId",
-                        column: x => x.FkSTMId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FOTA",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductCategory = table.Column<int>(type: "int", nullable: true),
-                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ExpireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    FkOwnerId = table.Column<int>(type: "int", nullable: true),
-                    FkESPId = table.Column<int>(type: "int", nullable: true),
-                    FkSTMId = table.Column<int>(type: "int", nullable: true),
-                    FkHoltekId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FOTA", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FOTA_Company_FkOwnerId",
-                        column: x => x.FkOwnerId,
-                        principalTable: "Company",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_FOTA_SoftwareVersions_FkESPId",
-                        column: x => x.FkESPId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_FOTA_SoftwareVersions_FkHoltekId",
-                        column: x => x.FkHoltekId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_FOTA_SoftwareVersions_FkSTMId",
-                        column: x => x.FkSTMId,
-                        principalTable: "SoftwareVersions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -270,6 +152,140 @@ namespace GW.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SoftwareVersions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Version = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MicroType = table.Column<int>(type: "int", nullable: false),
+                    DeviceType = table.Column<int>(type: "int", nullable: false),
+                    Category = table.Column<int>(type: "int", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FkUserRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SoftwareVersions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SoftwareVersions_UserRoles_FkUserRoleId",
+                        column: x => x.FkUserRoleId,
+                        principalTable: "UserRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Devices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    ProductCategory = table.Column<int>(type: "int", nullable: false),
+                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    FkOwnerId = table.Column<int>(type: "int", nullable: false),
+                    FkESPId = table.Column<int>(type: "int", nullable: false),
+                    FkSTMId = table.Column<int>(type: "int", nullable: false),
+                    FkHoltekId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Devices_Company_FkOwnerId",
+                        column: x => x.FkOwnerId,
+                        principalTable: "Company",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Devices_SoftwareVersions_FkESPId",
+                        column: x => x.FkESPId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Devices_SoftwareVersions_FkHoltekId",
+                        column: x => x.FkHoltekId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Devices_SoftwareVersions_FkSTMId",
+                        column: x => x.FkSTMId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FOTA",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductCategory = table.Column<int>(type: "int", nullable: true),
+                    BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    ExpireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    FkOwnerId = table.Column<int>(type: "int", nullable: true),
+                    FkESPId = table.Column<int>(type: "int", nullable: true),
+                    FkSTMId = table.Column<int>(type: "int", nullable: true),
+                    FkHoltekId = table.Column<int>(type: "int", nullable: true),
+                    FkUserRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FOTA", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FOTA_Company_FkOwnerId",
+                        column: x => x.FkOwnerId,
+                        principalTable: "Company",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_FOTA_SoftwareVersions_FkESPId",
+                        column: x => x.FkESPId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_FOTA_SoftwareVersions_FkHoltekId",
+                        column: x => x.FkHoltekId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_FOTA_SoftwareVersions_FkSTMId",
+                        column: x => x.FkSTMId,
+                        principalTable: "SoftwareVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_FOTA_UserRoles_FkUserRoleId",
+                        column: x => x.FkUserRoleId,
+                        principalTable: "UserRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Logs",
                 columns: table => new
                 {
@@ -319,19 +335,6 @@ namespace GW.Core.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "SoftwareVersions",
-                columns: new[] { "Id", "Category", "DeviceType", "MicroType", "Path", "Version" },
-                values: new object[,]
-                {
-                    { 1, 1, 1, 3, "", "ESP01" },
-                    { 2, 1, 1, 3, "", "ESP02" },
-                    { 3, 1, 1, 1, "", "HT01" },
-                    { 4, 1, 1, 1, "", "HT02" },
-                    { 5, 1, 1, 2, "", "STM01" },
-                    { 6, 1, 1, 2, "", "STM02" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "FName", "LName", "Mobile", "Password", "Username" },
                 values: new object[] { new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"), "s", "hasanabadi", "09155909973", "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6", "sdh" });
@@ -340,6 +343,19 @@ namespace GW.Core.Migrations
                 table: "UserRoles",
                 columns: new[] { "Id", "FkRoleId", "FkUserId" },
                 values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
+
+            migrationBuilder.InsertData(
+                table: "SoftwareVersions",
+                columns: new[] { "Id", "Category", "DateTime", "DeviceType", "FkUserRoleId", "MicroType", "Path", "Version" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 3, "", "ESP01" },
+                    { 2, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 3, "", "ESP02" },
+                    { 3, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 1, "", "HT01" },
+                    { 4, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 1, "", "HT02" },
+                    { 5, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 2, "", "STM01" },
+                    { 6, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 2, "", "STM02" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Access_FkUnitId",
@@ -392,6 +408,11 @@ namespace GW.Core.Migrations
                 column: "FkSTMId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FOTA_FkUserRoleId",
+                table: "FOTA",
+                column: "FkUserRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Logs_FkDeviceId",
                 table: "Logs",
                 column: "FkDeviceId");
@@ -399,6 +420,11 @@ namespace GW.Core.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Logs_FkUserRoleId",
                 table: "Logs",
+                column: "FkUserRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SoftwareVersions_FkUserRoleId",
+                table: "SoftwareVersions",
                 column: "FkUserRoleId");
 
             migrationBuilder.CreateIndex(
@@ -444,13 +470,13 @@ namespace GW.Core.Migrations
                 name: "Devices");
 
             migrationBuilder.DropTable(
-                name: "UserRoles");
-
-            migrationBuilder.DropTable(
                 name: "Company");
 
             migrationBuilder.DropTable(
                 name: "SoftwareVersions");
+
+            migrationBuilder.DropTable(
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Roles");

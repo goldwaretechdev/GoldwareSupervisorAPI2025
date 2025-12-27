@@ -180,6 +180,9 @@ namespace GW.Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime2");
 
@@ -193,6 +196,9 @@ namespace GW.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("FkSTMId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FkUserRoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("HardwareVersion")
@@ -236,6 +242,8 @@ namespace GW.Core.Migrations
                     b.HasIndex("FkOwnerId");
 
                     b.HasIndex("FkSTMId");
+
+                    b.HasIndex("FkUserRoleId");
 
                     b.ToTable("FOTA");
                 });
@@ -324,7 +332,13 @@ namespace GW.Core.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("DeviceType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FkUserRoleId")
                         .HasColumnType("int");
 
                     b.Property<int>("MicroType")
@@ -341,6 +355,8 @@ namespace GW.Core.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FkUserRoleId");
+
                     b.ToTable("SoftwareVersions");
 
                     b.HasData(
@@ -348,7 +364,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 1,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 3,
                             Path = "",
                             Version = "ESP01"
@@ -357,7 +375,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 2,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 3,
                             Path = "",
                             Version = "ESP02"
@@ -366,7 +386,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 3,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 1,
                             Path = "",
                             Version = "HT01"
@@ -375,7 +397,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 4,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 1,
                             Path = "",
                             Version = "HT02"
@@ -384,7 +408,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 5,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 2,
                             Path = "",
                             Version = "STM01"
@@ -393,7 +419,9 @@ namespace GW.Core.Migrations
                         {
                             Id = 6,
                             Category = 1,
+                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
                             DeviceType = 1,
+                            FkUserRoleId = 1,
                             MicroType = 2,
                             Path = "",
                             Version = "STM02"
@@ -595,6 +623,12 @@ namespace GW.Core.Migrations
                         .HasForeignKey("FkSTMId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("GW.Core.Models.UserRoles", "UserRoles")
+                        .WithMany("FOTAs")
+                        .HasForeignKey("FkUserRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ESP");
 
                     b.Navigation("Holtek");
@@ -602,6 +636,8 @@ namespace GW.Core.Migrations
                     b.Navigation("ProductOwner");
 
                     b.Navigation("STM");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("GW.Core.Models.Log", b =>
@@ -621,6 +657,17 @@ namespace GW.Core.Migrations
                     b.Navigation("Device");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("GW.Core.Models.SoftwareVersion", b =>
+                {
+                    b.HasOne("GW.Core.Models.UserRoles", "UserRoles")
+                        .WithMany("SoftwareVersions")
+                        .HasForeignKey("FkUserRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("GW.Core.Models.UserAndCompany", b =>
@@ -711,7 +758,11 @@ namespace GW.Core.Migrations
 
             modelBuilder.Entity("GW.Core.Models.UserRoles", b =>
                 {
+                    b.Navigation("FOTAs");
+
                     b.Navigation("Logs");
+
+                    b.Navigation("SoftwareVersions");
                 });
 #pragma warning restore 612, 618
         }

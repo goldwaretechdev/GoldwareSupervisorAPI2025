@@ -72,46 +72,6 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-        #region SoftwareFile 
-        [HttpPost]
-        public IActionResult SoftwareFile([FromBody]int request)
-        {
-            try
-            {
-                var path = _softwareVersionRepository.File(request);
-                if (string.IsNullOrEmpty(path))
-                {
-                    return BadRequest(ErrorCode.NO_CONTENT);
-                }
-                else
-                {
-                    if (!System.IO.File.Exists(path))
-                        return NotFound();
-                    string fileName = path.ToString().Split("\\").Last();
-
-                    var file = PhysicalFile(path, "application/octet-stream", fileName);
-                    var stream = new FileStream(
-                        path,
-                        FileMode.Open,
-                        FileAccess.Read,
-                        FileShare.Read
-                    );
-
-                    return File(
-                        stream,
-                        file.ContentType,
-                        file.FileName
-                    );
-
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
-            }
-        }
-        #endregion
-
         #region SetDeviceSettings
         [HttpPost]
         public IActionResult SetDeviceSettings([FromBody] SettingDto request)
@@ -195,15 +155,15 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-        #region UploadSoftware
+        #region UploadSoftwareFile
         [HttpPost]
-        public async Task<IActionResult> UploadSoftware([FromForm] UploadSoftwareVersion version, [FromForm]IFormFile file)
+        public async Task<IActionResult> UploadSoftwareFile([FromForm] UploadSoftwareVersion version)
         {
             try
             {
-                if (version is null)
+                if (version.Condition is null)
                     return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
-                if (file == null || file.Length == 0)
+                if (version.File == null || version.File.Length == 0)
                     return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
 
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
@@ -213,7 +173,7 @@ namespace GW.SupervisorPanelAPI.Controller
                 if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
                 var userRole = data.Data;
 
-                var result =_softwareVersionRepository.Insert(version,file,userRole.Id);
+                var result =await _softwareVersionRepository.Insert(version,userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -221,6 +181,47 @@ namespace GW.SupervisorPanelAPI.Controller
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
-        #endregion       
+        #endregion
+
+        #region SoftwareFile 
+        [HttpPost]
+        public IActionResult SoftwareFile([FromBody] int request)
+        {
+            try
+            {
+                var path = _softwareVersionRepository.File(request);
+                if (string.IsNullOrEmpty(path))
+                {
+                    return BadRequest(ErrorCode.NO_CONTENT);
+                }
+                else
+                {
+                    if (!System.IO.File.Exists(path))
+                        return NotFound();
+                    string fileName = path.ToString().Split("\\").Last();
+
+                    var file = PhysicalFile(path, "application/octet-stream", fileName);
+                    var stream = new FileStream(
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read
+                    );
+
+                    return File(
+                        stream,
+                        file.ContentType,
+                        file.FileName
+                    );
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
     }
 }

@@ -13,6 +13,7 @@ namespace GW.Core.Context
     {
         private static readonly Guid SeedUserId = Guid.Parse("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05");
         private static readonly DateTime SeedDate = DateTime.Parse("2025-12-11T09:30:00Z");
+        private static readonly int SeedUserRoleId = 1;
 
         public SupervisorContext(DbContextOptions<SupervisorContext> options):base(options) { }
 
@@ -90,6 +91,18 @@ namespace GW.Core.Context
                 .HasOne(a=>a.Holtek)
                 .WithMany(u=>u.FOTAHoltekVersions)
                 .HasForeignKey(a=>a.FkHoltekId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.Entity<FOTA>()
+                .HasOne(a=>a.UserRoles)
+                .WithMany(u=>u.FOTAs)
+                .HasForeignKey(a=>a.FkUserRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.Entity<SoftwareVersion>()
+                .HasOne(a=>a.UserRoles)
+                .WithMany(u=>u.SoftwareVersions)
+                .HasForeignKey(a=>a.FkUserRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             builder.Entity<Log>()
@@ -171,7 +184,7 @@ namespace GW.Core.Context
             builder.Entity<UserRoles>().HasData(
                 new UserRoles
                 {
-                    Id = 1,
+                    Id = SeedUserRoleId,
                     FkRoleId = 1,
                     FkUserId = SeedUserId
                 });
@@ -202,7 +215,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.ESP,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime = SeedDate,
                 },
                 new SoftwareVersion()
                 {
@@ -211,7 +226,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.ESP,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime= SeedDate,
                 },
                 new SoftwareVersion()
                 {
@@ -220,7 +237,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.Holtek,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime = SeedDate,
                 },
                 new SoftwareVersion()
                 {
@@ -229,7 +248,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.Holtek,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime = SeedDate,
                 },
                 new SoftwareVersion()
                 {
@@ -238,7 +259,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.STM,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime = SeedDate,
                 },
                 new SoftwareVersion()
                 {
@@ -247,7 +270,9 @@ namespace GW.Core.Context
                     Path = "",
                     MicroType = MicroType.STM,
                     Category = ProductCategory.Lena,
-                    DeviceType = DeviceType.SWITCH
+                    DeviceType = DeviceType.SWITCH,
+                    FkUserRoleId = SeedUserRoleId,
+                    DateTime = SeedDate,
                 }
             );
         }
