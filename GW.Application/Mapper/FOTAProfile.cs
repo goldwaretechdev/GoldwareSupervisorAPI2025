@@ -13,7 +13,7 @@ namespace GW.Application.Mapper
     {
         public FOTAProfile()
         {
-            CreateMap<FOTADto, FOTA>();
+            CreateMap<FOTADto, FOTA>().ReverseMap();
         }
     }
 }

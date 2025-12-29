@@ -9,6 +9,7 @@ namespace GW.Core.Models
         public int Id { get; set; }
         [MaxLength(50)]
         public string? Name { get; set; }
+        public string UniqueId { get; set; }
         public DeviceType Type { get; set; }
         public ProductCategory ProductCategory { get; set; }
         [MaxLength(50)]
@@ -17,7 +18,7 @@ namespace GW.Core.Models
         public string? SerialNumber { get; set; }
         public DateTime ProductionDate { get; set; }
         public DateTime LastUpdate { get; set; }
-        [MaxLength(50)]
+        [MaxLength(10)]
         public string HardwareVersion { get; set; }
         [MaxLength(50)]
         public string? MAC { get; set; }

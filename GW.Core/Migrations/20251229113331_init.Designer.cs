@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20251227070949_init")]
+    [Migration("20251229113331_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -127,8 +127,8 @@ namespace GW.Core.Migrations
 
                     b.Property<string>("HardwareVersion")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("IMEI")
                         .HasMaxLength(50)
@@ -157,6 +157,10 @@ namespace GW.Core.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
+
+                    b.Property<string>("UniqueId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

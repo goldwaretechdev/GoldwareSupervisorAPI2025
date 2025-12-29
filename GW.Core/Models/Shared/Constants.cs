@@ -15,6 +15,10 @@ namespace GW.Core.Models.Shared
         public static int FOTA_TIMER = 10;
         public static string FOTA_FILE = "fota";
         public static string SOFT_FILE = "soft";
+        public static string FOTA_ESP_FILE_CONTENT = "FOTA_ESP";
+        public static string FOTA_STM_FILE_CONTENT = "FOTA_STM";
+        public static string FOTA_HOLTECK_FILE_CONTENT = "FOTA_HOLTECK";
+        public static readonly string NULL_SETTING_VALUE = "-1";
     }
 
     public static class ErrorCode

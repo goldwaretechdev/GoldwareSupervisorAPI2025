@@ -17,7 +17,7 @@ namespace GW.Application.Sevices
         public string GenerateToken(Guid userId,string role);
         public Guid GetUserId(string token);
         public string GetUserRole(string token);
-        public Task<string> PutFileAsync(IFormFile file,string type);
+        public Task<string> PutFileAsync(IFormFile file,string type,string name);
         public FOTADto ConvertStringToSettings(string setting);
 
     }
@@ -90,12 +90,12 @@ namespace GW.Application.Sevices
         #endregion
 
         #region PutFile
-        public async Task<string> PutFileAsync(IFormFile file,string type)
+        public async Task<string> PutFileAsync(IFormFile file,string type,string name)
         {
             try
             {
                 //string name = fota.File.FileName;
-                string name = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+               
                 //imageName = imageName + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(fileName.FileName);
                 var filePath = type switch
                 {
@@ -129,7 +129,7 @@ namespace GW.Application.Sevices
         public FOTADto ConvertStringToSettings(string setting)
         {
             FOTADto settingDto = new();
-            var all = setting.Replace("#", string.Empty);
+            string all = setting.Replace("#", "").Replace("$", "");
             var items = all.Split('*');
             foreach (var item in items)
             {
@@ -152,55 +152,55 @@ namespace GW.Application.Sevices
                         }
                         break;
                     case "102":
-                        settingDto.BatchNumber = code[1].Trim();
+                        settingDto.BatchNumber = code[1].Trim() == Constants.NULL_SETTING_VALUE ? null : code[1].Trim();
                         break;
                     case "103":
-                        settingDto.SerialNumber = code[1].Trim();
+                        settingDto.SerialNumber = code[1].Trim() == Constants.NULL_SETTING_VALUE ? null : code[1].Trim();
                         break;
                     case "104":
-                        if (!string.IsNullOrEmpty(code[1]))
+                        if (DateTime.TryParse(code[1].Trim(), out DateTime date))
                         {
-                            settingDto.ProductionDate = DateTime.Parse(code[1]);
+                            settingDto.ProductionDate = date;
                         }
                         break;
                     case "105":
-                        if (!string.IsNullOrEmpty(code[1]))
+                        if (DateTime.TryParse(code[1].Trim(), out DateTime last))
                         {
-                            settingDto.LastUpdate = DateTime.Parse(code[1]);
+                            settingDto.LastUpdate = last;
                         }
                         break;
                     case "106":
-                        settingDto.HardwareVersion = code[1].Trim();
+                        settingDto.HardwareVersion = code[1].Trim() == Constants.NULL_SETTING_VALUE ? null : code[1].Trim();
                         break;
                     case "107":
-                        settingDto.MAC = code[1].Trim();
+                        settingDto.MAC = code[1].Trim() == Constants.NULL_SETTING_VALUE ? null : code[1].Trim();
                         break;
                     case "108":
-                        settingDto.IMEI = code[1].Trim();
+                        settingDto.IMEI = code[1].Trim() == Constants.NULL_SETTING_VALUE ? null : code[1].Trim();
                         break;
                     case "109":
                         settingDto.FkOwnerId = int.Parse(code[1].Trim());
                         break;
                     case "110":
-                        //settingDto.OwnerName = code[1].Trim();
+                        //settingDto.OwnerName = code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim();
                         break;
                     case "111":
-                        settingDto.FkESPId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
+                        settingDto.FkESPId = int.Parse(code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim());
                         break;
                     case "112":
-                        //settingDto.ESPVersion = code[1].Trim();
+                        //settingDto.ESPVersion = code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim();
                         break;
                     case "113":
-                        settingDto.FkSTMId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
+                        settingDto.FkSTMId = int.Parse(code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim());
                         break;
                     case "114":
-                        //settingDto.STMVersion = code[1].Trim();
+                        //settingDto.STMVersion = code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim();
                         break;
                     case "115":
-                        settingDto.FkHoltekId = string.IsNullOrEmpty(code[1].Trim()) ? null : int.Parse(code[1]);
+                        settingDto.FkHoltekId = int.Parse(code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim());
                         break;
                     case "116":
-                        //settingDto.HoltekVersion = code[1].Trim();
+                        //settingDto.HoltekVersion = code[1].Trim() == Constants.NULL_SETTING_VALUE ? string.Empty : code[1].Trim();
                         break;
                 }
             }

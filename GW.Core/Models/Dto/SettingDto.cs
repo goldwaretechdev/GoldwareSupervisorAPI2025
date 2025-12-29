@@ -9,6 +9,7 @@ namespace GW.Core.Models.Dto
 {
     public class SettingDto
     {
+        public string? UniqueId { get; set; }
         public DeviceType Type { get; set; }                                         //100                
         public ProductCategory ProductCategory { get; set; }                         //101
         [MaxLength(50)]

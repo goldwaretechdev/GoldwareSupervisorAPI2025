@@ -80,6 +80,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/api/health", () => StatusCodes.Status200OK);
+
 app.Run();
 
 

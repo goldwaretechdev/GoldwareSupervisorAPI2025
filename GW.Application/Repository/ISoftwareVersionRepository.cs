@@ -88,7 +88,8 @@ namespace GW.Application.Repository
                 && s.MicroType == condition.MicroType
                 && s.Version == condition.Version))
                 return Result.Fail(ErrorCode.DUPLICATE_DATA, "ورژن وارد شده تکراری می باشد!");
-            var path = await _baseData.PutFileAsync(version.File,Constants.SOFT_FILE);
+            string name = Guid.NewGuid().ToString() + Path.GetExtension(version.File.FileName);
+            var path = await _baseData.PutFileAsync(version.File,Constants.SOFT_FILE, name);
             if (!string.IsNullOrEmpty(path))
             {
                 SoftwareVersion softwareVersion = new()
