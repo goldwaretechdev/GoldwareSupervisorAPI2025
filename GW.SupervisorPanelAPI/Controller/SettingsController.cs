@@ -3,6 +3,7 @@ using GW.Application.Repository;
 using GW.Application.Sevices;
 using GW.Core.Models;
 using GW.Core.Models.Dto;
+using GW.Core.Models.Enum;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,26 +18,27 @@ namespace GW.SupervisorPanelAPI.Controller
     public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
+        private readonly ILogRepository _logRepository;
         private readonly IFOTARepository _fotaRepository;
         private readonly IUserRepository _userRepository;
         private readonly IBaseData _baseData;
-        private readonly ISettingsService _settingsService;
         private readonly IOwnerRepository _ownerRepository;
         private readonly ISoftwareVersionRepository _softwareVersionRepository;
 
         #region ctor
         public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
-            ,ISettingsService settingsService,IOwnerRepository ownerRepository
+            ,IOwnerRepository ownerRepository
             ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository
-            ,IFOTARepository fOTARepository)
+            ,IFOTARepository fOTARepository
+            ,ILogRepository logRepository)
         {
             _deviceRepository = deviceRepository;
             _userRepository = userRepository;
             _baseData = baseData;
-            _settingsService = settingsService;
             _ownerRepository = ownerRepository;
             _softwareVersionRepository = softwareVersion;
             _fotaRepository = fOTARepository;
+            _logRepository = logRepository;
         }
         #endregion
 
@@ -85,6 +87,18 @@ namespace GW.SupervisorPanelAPI.Controller
                 if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
                 var userRole = data.Data;
                 var result = _deviceRepository.Insert(request,userRole.Id);
+                if (result.Success)
+                {
+                    //save log
+                    LogDto log = new()
+                    {
+                        DateTime = DateTime.Now,
+                        FkDeviceId = result.Data,
+                        FkUserRoleId = userRole.Id,
+                        Type = LogType.SetSettings,
+                    };
+                    var log_result = _logRepository.Insert(log);
+                }
                 return Ok(result);
             }
             catch (Exception ex)
@@ -100,7 +114,13 @@ namespace GW.SupervisorPanelAPI.Controller
         {
             try
             {
-                var result = _deviceRepository.Update(request);
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var data = _userRepository.UserRole(userId, role);
+                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
+                var userRole = data.Data;
+                var result = _deviceRepository.Update(request,userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)

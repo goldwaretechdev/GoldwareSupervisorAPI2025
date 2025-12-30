@@ -30,6 +30,8 @@ namespace GW.Core.Models
         [MaxLength(50)]
         public string? IMEI { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
         public Company? ProductOwner { get; set; }
         public int? FkOwnerId { get; set; }
 

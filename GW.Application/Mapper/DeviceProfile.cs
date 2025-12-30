@@ -23,6 +23,7 @@ namespace GW.Application.Mapper
                 opt.MapFrom(src => src.STM.Version))
                 .ForPath(dst => dst.HoltekVersion, opt =>
                 opt.MapFrom(src => src.Holtek.Version));
+            CreateMap<Device, DeviceDto>();
                 
         }
     }

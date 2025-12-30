@@ -1,5 +1,6 @@
 ﻿using GW.Application.Repository;
 using GW.Application.Sevices;
+using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -13,29 +14,29 @@ namespace GW.SupervisorPanelAPI.Controller
     {
         private readonly IDeviceRepository _deviceRepository;
         private readonly IFOTARepository _fotaRepository;
+        private readonly ILogRepository _logRepository;
         private readonly IBaseData _baseData;
-        private readonly ISettingsService _settingsService;
         private readonly IMemoryCache _cache;
 
         public DeviceManagmentController(IDeviceRepository deviceRepository, IBaseData baseData
-            , ISettingsService settingsService
             , IFOTARepository fOTARepository
+            ,ILogRepository logRepository
             , IMemoryCache memoryCache)
         {
             _deviceRepository = deviceRepository;
             _baseData = baseData;
-            _settingsService = settingsService;
             _fotaRepository = fOTARepository;
             _cache = memoryCache;
+            _logRepository= logRepository;
         }
 
         #region Check
         [HttpPost("[action]")]
-        public async Task<IActionResult> Check([FromBody] string request)
+        public async Task<IActionResult> Check([FromBody] CheckRequest request)
         {
             try
             {
-                var setting = _baseData.ConvertStringToSettings(request);
+                var setting = _baseData.ConvertStringToSettings(request.SetSetting);
                 var fota = _fotaRepository.Check(setting);
                 if (fota is null) return Ok(Result<DeviceCheckDto>
                     .Ok(new DeviceCheckDto { AccessCode = ErrorCode.NO_CONTENT, Type = ErrorCode.NO_CONTENT }));
@@ -54,6 +55,16 @@ namespace GW.SupervisorPanelAPI.Controller
                     AccessCode = Constants.FOTA_URL_IDENTITY.ToString(),
                     Type = type,
                 };
+                var device = _deviceRepository.GetDeviceByUniqueId(request.UniqueId);
+                if (!device.Success) return Ok(device);
+                LogDto log = new()
+                {
+                    DateTime = DateTime.Now,
+                    FkDeviceId = device.Data.Id,
+                    Type = Core.Models.Enum.LogType.FOTA_Update_Requested,
+                    Desc = "Type = " + type + ", FOTA_Id = " + fota.Id
+                };
+                var log_result = _logRepository.Insert(log);
                 return Ok(Result<DeviceCheckDto>.Ok(result));
             }
             catch (Exception ex)
@@ -96,20 +107,20 @@ namespace GW.SupervisorPanelAPI.Controller
         {
             try
             {
+                var device = _deviceRepository.GetDeviceByUniqueId(request.UniqueId);
+                if (!device.Success) return Ok(device);
+                LogDto log = new()
+                {
+                    DateTime = DateTime.Now,
+                    FkDeviceId = device.Data.Id,
+                    Type = Core.Models.Enum.LogType.FOTA_Update_Done,
+                    Desc = "ErrorCode = " + request.ErrorCode 
+                    + " , Desc= " + request.Message
+                    + " , Type= " + request.Type
+                };
+                var result = _logRepository.Insert(log);
                 return Ok(Result.Ok());
-                //  Check access
-                //var path = _cache.Get(route);
-                //if (string.IsNullOrEmpty((string?)path))
-                //{
-                //    return BadRequest(ErrorCode.NO_CONTENT);
-                //}
-                //else
-                //{
-                //    if (!System.IO.File.Exists((string?)path))
-                //        return NotFound();
-                //    string fileName = path.ToString().Split("\\").Last();
-                //    return PhysicalFile((string)path, "application/octet-stream", fileName);
-                //}
+                
             }
             catch (Exception ex)
             {

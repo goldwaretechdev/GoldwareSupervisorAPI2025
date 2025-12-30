@@ -10,11 +10,13 @@ namespace GW.Core.Models.Dto
 {
     public class FOTADto
     {
+        public int Id { get; set; }
         public DeviceType Type { get; set; }
         public string Path { get; set; }
         public ProductCategory? ProductCategory { get; set; }
         [MaxLength(50)]
         public string? BatchNumber { get; set; }
+        public bool IsActive { get; set; } = true;
         [MaxLength(50)]
         public string? SerialNumber { get; set; }
         public DateTime? ExpireDate { get; set; }

@@ -16,7 +16,7 @@ namespace GW.Application.Sevices
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IBaseData, BaseData>();
             services.AddScoped<IOwnerRepository, OwnerRepository>();
-            services.AddScoped<ISettingsService, SettingsService>();
+            services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<ISoftwareVersionRepository, SoftwareRepository>();
             services.AddScoped<IDeviceRepository, DeviceRepository>();
             services.AddScoped<IFOTARepository, FOTARepository>();

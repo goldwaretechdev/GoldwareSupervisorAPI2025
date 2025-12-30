@@ -4,6 +4,7 @@ using GW.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    partial class SupervisorContextModelSnapshot : ModelSnapshot
+    [Migration("20251230064533_log-changed")]
+    partial class logchanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,9 +125,6 @@ namespace GW.Core.Migrations
                     b.Property<int>("FkSTMId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FkUserRoleId")
-                        .HasColumnType("int");
-
                     b.Property<string>("HardwareVersion")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -172,8 +172,6 @@ namespace GW.Core.Migrations
 
                     b.HasIndex("FkSTMId");
 
-                    b.HasIndex("FkUserRoleId");
-
                     b.ToTable("Devices");
                 });
 
@@ -217,9 +215,6 @@ namespace GW.Core.Migrations
                     b.Property<string>("IMEI")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastUpdate")
                         .HasColumnType("datetime2");
@@ -604,12 +599,6 @@ namespace GW.Core.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GW.Core.Models.UserRoles", "UserRoles")
-                        .WithMany("Devices")
-                        .HasForeignKey("FkUserRoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("ESP");
 
                     b.Navigation("Holtek");
@@ -617,8 +606,6 @@ namespace GW.Core.Migrations
                     b.Navigation("ProductOwner");
 
                     b.Navigation("STM");
-
-                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("GW.Core.Models.FOTA", b =>
@@ -777,8 +764,6 @@ namespace GW.Core.Migrations
 
             modelBuilder.Entity("GW.Core.Models.UserRoles", b =>
                 {
-                    b.Navigation("Devices");
-
                     b.Navigation("FOTAs");
 
                     b.Navigation("Logs");

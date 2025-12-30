@@ -9,12 +9,13 @@ namespace GW.Core.Models.Enum
     public enum LogType
     {
         SetSettings=1,
-        GetSettings =2,
-        FOTA_Update=3,
-        Programming_ESP=4,
-        Programming_STM=5,
-        Programming_HT=6,
-        Stock = 7,
-        Sale = 8,
+        GetSettings=2,
+        FOTA_Update_Requested = 3,
+        FOTA_Update_Done=4,
+        Programming_ESP=5,
+        Programming_STM=6,
+        Programming_HT=7,
+        Stock = 8,
+        Sale = 9,
     }
 }

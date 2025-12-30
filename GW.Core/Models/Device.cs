@@ -37,6 +37,8 @@ namespace GW.Core.Models
         public SoftwareVersion Holtek { get; set; }
         public int FkHoltekId { get; set; }
 
+        public UserRoles UserRoles { get; set; }
+        public int FkUserRoleId { get; set; }
 
         public ICollection<Log> Logs { get; set; }
 

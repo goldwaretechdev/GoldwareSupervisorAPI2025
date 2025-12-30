@@ -69,6 +69,12 @@ namespace GW.Core.Context
                 .HasForeignKey(a=>a.FkHoltekId)
                 .OnDelete(DeleteBehavior.Restrict);
             
+            builder.Entity<Device>()
+                .HasOne(a=>a.UserRoles)
+                .WithMany(u=>u.Devices)
+                .HasForeignKey(a=>a.FkUserRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
             builder.Entity<FOTA>()
                 .HasOne(a=>a.ProductOwner)
                 .WithMany(u=>u.FOTAs)

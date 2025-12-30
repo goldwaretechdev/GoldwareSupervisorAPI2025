@@ -87,7 +87,8 @@ namespace GW.Application.Repository
                             FkSTMId = setting.FkSTMId,
                             HardwareVersion = setting.HardwareVersion,
                             Path = path,
-                            FkUserRoleId = userRole
+                            FkUserRoleId = userRole,
+                            IsActive = true,
                         };
                         _context.FOTA.Add(fota_settings);
                         _context.SaveChanges();
@@ -138,22 +139,22 @@ namespace GW.Application.Repository
             var fota = _context.FOTA
                 .Where(f =>
                     f.Type == setting.Type &&
-                    f.ProductCategory == setting.ProductCategory &&
-                    f.FkOwnerId == setting.FkOwnerId &&
+                    (f.ProductCategory==null || f.ProductCategory == setting.ProductCategory )&&
+                    (f.FkOwnerId==null || f.FkOwnerId == setting.FkOwnerId) &&
                     ((f.FkESPId!=null && f.FkESPId == setting.FkESPId )||
                     (f.FkHoltekId!=null && f.FkHoltekId == setting.FkHoltekId) ||
                     (f.FkSTMId!=null && f.FkSTMId == setting.FkSTMId ))&&
-                    f.BatchNumber == setting.BatchNumber &&
-                    f.SerialNumber == setting.SerialNumber &&
-                    f.IMEI == setting.IMEI &&
-                    f.MAC == setting.MAC &&
-                    f.HardwareVersion == setting.HardwareVersion
-                )
+                    (f.BatchNumber == null || f.BatchNumber == setting.BatchNumber) &&
+                    (f.SerialNumber == null || f.SerialNumber == setting.SerialNumber) &&
+                    (f.IMEI == null || f.IMEI == setting.IMEI) &&
+                    (f.MAC == null || f.MAC == setting.MAC) &&
+                    (f.HardwareVersion == null || f.HardwareVersion == setting.HardwareVersion)
+                    && f.IsActive)
                 .FirstOrDefault();
             if (fota is not null)
             {
-                if (fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.GetValueOrDefault().Date
-                && fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.GetValueOrDefault().Date)
+                if ((fota.ProductionDate==null || fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.GetValueOrDefault().Date)
+                && (fota.LastUpdate==null || fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.GetValueOrDefault().Date))
                     return null;
             }
             else { return null; }
