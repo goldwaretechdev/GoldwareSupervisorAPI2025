@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System;
 
 namespace GW.SupervisorPanelAPI.Controller
 {
@@ -24,13 +25,15 @@ namespace GW.SupervisorPanelAPI.Controller
         private readonly IBaseData _baseData;
         private readonly IOwnerRepository _ownerRepository;
         private readonly ISoftwareVersionRepository _softwareVersionRepository;
+        private readonly ILogger<SettingsController> _logger;
 
         #region ctor
         public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
             ,IOwnerRepository ownerRepository
             ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository
             ,IFOTARepository fOTARepository
-            ,ILogRepository logRepository)
+            ,ILogRepository logRepository,
+            ILogger<SettingsController> logger)
         {
             _deviceRepository = deviceRepository;
             _userRepository = userRepository;
@@ -39,6 +42,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _softwareVersionRepository = softwareVersion;
             _fotaRepository = fOTARepository;
             _logRepository = logRepository;
+            _logger= logger;
         }
         #endregion
 
@@ -53,6 +57,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Get Owners Failed");
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -69,6 +74,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Get SoftwareVersions Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -103,6 +109,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "SetDeviceSettings Failed by input: {request}", request);
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
@@ -125,6 +132,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "UpdateSettings Failed by input: {request}", request);
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
@@ -141,6 +149,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "GetSettings Failed by input: {request}", serial);
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
@@ -170,6 +179,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Post FOTA Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -199,6 +209,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "DeactivatePrevSameFiles Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -227,6 +238,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "UploadSoftwareFile Failed by input: {request}", version);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -267,6 +279,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Get SoftwareFile Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }

@@ -40,7 +40,7 @@ namespace GW.Core.Models
         public UserRoles UserRoles { get; set; }
         public int FkUserRoleId { get; set; }
 
-        public ICollection<Log> Logs { get; set; }
+        public ICollection<Log>? Logs { get; set; }
 
     }
 }

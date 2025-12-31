@@ -1,4 +1,5 @@
-﻿using GW.Application.Repository;
+﻿using Azure.Core;
+using GW.Application.Repository;
 using GW.Application.Sevices;
 using GW.Core.Models;
 using GW.Core.Models.Dto;
@@ -17,17 +18,21 @@ namespace GW.SupervisorPanelAPI.Controller
         private readonly ILogRepository _logRepository;
         private readonly IBaseData _baseData;
         private readonly IMemoryCache _cache;
+        private readonly ILogger<DeviceManagmentController> _logger;
 
-        public DeviceManagmentController(IDeviceRepository deviceRepository, IBaseData baseData
+        public DeviceManagmentController(IDeviceRepository deviceRepository
+            , IBaseData baseData
             , IFOTARepository fOTARepository
             ,ILogRepository logRepository
-            , IMemoryCache memoryCache)
+            , IMemoryCache memoryCache
+            ,ILogger<DeviceManagmentController> logger)
         {
             _deviceRepository = deviceRepository;
             _baseData = baseData;
             _fotaRepository = fOTARepository;
             _cache = memoryCache;
             _logRepository= logRepository;
+            _logger = logger;
         }
 
         #region Check
@@ -69,6 +74,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Check Failed by input: {request}", request);
                 return BadRequest(Result<string>.Fail(ErrorCode.INTERNAL_ERROR, ex.Message));
             }
         }
@@ -96,6 +102,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Get FOTAFile Failed");
                 return BadRequest(ErrorCode.INTERNAL_ERROR);
             }
         }
@@ -124,6 +131,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Verify by input: {request}", request);
                 return BadRequest(Result.Fail(ErrorCode.INTERNAL_ERROR,""));
             }
         }

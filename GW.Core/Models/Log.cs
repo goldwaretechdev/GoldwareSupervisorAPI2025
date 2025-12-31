@@ -16,8 +16,8 @@ namespace GW.Core.Models
         [MaxLength(150)]
         public string? Desc { get; set; }
         public LogType Type { get; set; }
-        public Device Device { get; set; }
-        public int FkDeviceId { get; set; }
+        public Device? Device { get; set; }
+        public int? FkDeviceId { get; set; }
 
         public UserRoles? UserRole { get; set; }
         public int? FkUserRoleId { get; set; }

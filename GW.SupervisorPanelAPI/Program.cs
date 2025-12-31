@@ -4,6 +4,7 @@ using GW.Core.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,6 +66,12 @@ builder.Services.AddMemoryCache();
 
 #endregion
 
+#region Log 
+Log.Logger = new LoggerConfiguration().MinimumLevel.Error()
+    .WriteTo.File("Logs/log-{Date}.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+builder.Host.UseSerilog();
+#endregion
 
 var app = builder.Build();
 

@@ -13,11 +13,14 @@ namespace GW.SupervisorPanelAPI.Controller
     {
         private readonly IUserRepository _userRepository;
         private readonly IBaseData _baseData;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserRepository userRepository,IBaseData baseData)
+        public UserController(IUserRepository userRepository,IBaseData baseData
+            ,ILogger<UserController> logger)
         {
             _userRepository = userRepository;
             _baseData = baseData;
+            _logger = logger;
         }
 
         #region Login
@@ -31,6 +34,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Login Failed ");
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }
@@ -47,6 +51,7 @@ namespace GW.SupervisorPanelAPI.Controller
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Get Token Failed ");
                 return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
             }
         }

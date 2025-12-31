@@ -15,7 +15,7 @@ namespace GW.Core.Models.Dto
         [MaxLength(150)]
         public string? Desc { get; set; }
         public LogType Type { get; set; }
-        public int FkDeviceId { get; set; }
+        public int? FkDeviceId { get; set; }
         public int? FkUserRoleId { get; set; }
     }
 }
