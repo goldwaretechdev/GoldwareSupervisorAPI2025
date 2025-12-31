@@ -28,6 +28,7 @@ namespace GW.Core.Models.Shared
         public static readonly string INVALID_ID = "INVALID_ID";
         public static readonly string DUPLICATE_DATA = "DUPLICATE_DATA";
         public static readonly string NO_FILE_UPLOADED = "NO_FILE_UPLOADED";
+        public static readonly string SAME_FILE_EXISTS = "SAME_FILE_EXISTS";
         public static readonly string NO_CONTENT = "NO_CONTENT";
         public static readonly string ACTION_LOCKED = "ACTION_LOCKED";
     }

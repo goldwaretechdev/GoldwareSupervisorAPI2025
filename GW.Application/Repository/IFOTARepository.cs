@@ -11,6 +11,7 @@ namespace GW.Application.Repository
     public interface IFOTARepository
     {
         public Task<Result> InsertAsync(UpdateFOTARequest fota, int userRole);
+        public Task<Result> InsertAndDeactiveSameFiles(UpdateFOTARequest fota, int userRole);
         public FOTADto Check(FOTADto setting);
     }
 
@@ -46,7 +47,8 @@ namespace GW.Application.Repository
                    f.SerialNumber == setting.SerialNumber &&
                    f.IMEI == setting.IMEI &&
                    f.MAC == setting.MAC &&
-                   f.HardwareVersion == setting.HardwareVersion
+                   f.HardwareVersion == setting.HardwareVersion &&
+                   f.IsActive
                )
                .FirstOrDefault();
             if (check is not null)
@@ -56,49 +58,36 @@ namespace GW.Application.Repository
                 {
                     string name = check.Path.Split("\\").Last();
                     var path = await _baseData.PutFileAsync(fota.File, Constants.FOTA_FILE, name);
-                    check.Path= path;
+                    check.Path = path;
                     _context.FOTA.Update(check);
                     _context.SaveChanges();
                     return Result.Ok();
                 }
-
                 else
                 {
-
-                    string name = Guid.NewGuid().ToString() + Path.GetExtension(fota.File.FileName);
-                    var path = await _baseData.PutFileAsync(fota.File, Constants.FOTA_FILE,name);
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        //FOTA fota_settings = _mapper.Map<FOTA>(setting);
-                        FOTA fota_settings = new()
-                        {
-                            BatchNumber = setting.BatchNumber,
-                            SerialNumber = setting.SerialNumber,
-                            IMEI = setting.IMEI,
-                            MAC = setting.MAC,
-                            ExpireDate = setting.ExpireDate,
-                            ProductCategory = setting.ProductCategory,
-                            Type = setting.Type,
-                            ProductionDate = setting.ProductionDate,
-                            LastUpdate = setting.LastUpdate,
-                            FkESPId = setting.FkESPId,
-                            FkHoltekId = setting.FkHoltekId,
-                            FkOwnerId = setting.FkOwnerId,
-                            FkSTMId = setting.FkSTMId,
-                            HardwareVersion = setting.HardwareVersion,
-                            Path = path,
-                            FkUserRoleId = userRole,
-                            IsActive = true,
-                        };
-                        _context.FOTA.Add(fota_settings);
-                        _context.SaveChanges();
-                        return Result.Ok();
-                    }
-                    return Result.Fail(ErrorCode.NO_FILE_UPLOADED, "خطا در آپلود فایل!");
+                    return Result.Fail(ErrorCode.SAME_FILE_EXISTS, "فایل با شرایط مشابه وجود دارد.");
                 }
             }
             else
             {
+                var check_same = _context.FOTA
+               .Where(f =>
+                  (f.Type == setting.Type ||
+                   f.ProductCategory == setting.ProductCategory ||
+                   f.FkOwnerId == setting.FkOwnerId ||
+                   f.FkESPId == setting.FkESPId ||
+                   f.FkHoltekId == setting.FkHoltekId ||
+                   f.FkSTMId == setting.FkSTMId ||
+                   f.BatchNumber == setting.BatchNumber ||
+                   f.SerialNumber == setting.SerialNumber ||
+                   f.IMEI == setting.IMEI ||
+                   f.MAC == setting.MAC ||
+                   f.HardwareVersion == setting.HardwareVersion) &&
+                   f.IsActive)
+               .FirstOrDefault();
+                if (check_same is not null)
+                    return Result.Fail(ErrorCode.SAME_FILE_EXISTS, "فایل با شرایط مشابه وجود دارد.");
+
 
                 string name = Guid.NewGuid().ToString() + Path.GetExtension(fota.File.FileName);
                 var path = await _baseData.PutFileAsync(fota.File, Constants.FOTA_FILE, name);
@@ -122,7 +111,8 @@ namespace GW.Application.Repository
                         FkSTMId = setting.FkSTMId,
                         HardwareVersion = setting.HardwareVersion,
                         Path = path,
-                        FkUserRoleId = userRole
+                        FkUserRoleId = userRole,
+                        IsActive=true
                     };
                     _context.FOTA.Add(fota_settings);
                     _context.SaveChanges();
@@ -133,17 +123,86 @@ namespace GW.Application.Repository
         }
         #endregion
 
+        #region InsertAndDeactiveSameFiles
+        public async Task<Result> InsertAndDeactiveSameFiles(UpdateFOTARequest fota, int userRole)
+        {
+            _context.Database.BeginTransaction();
+            try
+            {
+                var setting = JsonConvert.DeserializeObject<FOTADto>(fota.Settings);
+                var check_same = _context.FOTA
+               .Where(f =>
+                  (f.Type == setting.Type ||
+                   f.ProductCategory == setting.ProductCategory ||
+                   f.FkOwnerId == setting.FkOwnerId ||
+                   f.FkESPId == setting.FkESPId ||
+                   f.FkHoltekId == setting.FkHoltekId ||
+                   f.FkSTMId == setting.FkSTMId ||
+                   f.BatchNumber == setting.BatchNumber ||
+                   f.SerialNumber == setting.SerialNumber ||
+                   f.IMEI == setting.IMEI ||
+                   f.MAC == setting.MAC ||
+                   f.HardwareVersion == setting.HardwareVersion) &&
+                   f.IsActive)
+               .ToList();
+                foreach (var item in check_same)
+                {
+                    item.IsActive = false;
+                    _context.FOTA.Update(item);
+                }
+
+                string name = Guid.NewGuid().ToString() + Path.GetExtension(fota.File.FileName);
+                var path = await _baseData.PutFileAsync(fota.File, Constants.FOTA_FILE, name);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    //FOTA fota_settings = _mapper.Map<FOTA>(setting);
+                    FOTA fota_settings = new()
+                    {
+                        BatchNumber = setting.BatchNumber,
+                        SerialNumber = setting.SerialNumber,
+                        IMEI = setting.IMEI,
+                        MAC = setting.MAC,
+                        ExpireDate = setting.ExpireDate,
+                        ProductCategory = setting.ProductCategory,
+                        Type = setting.Type,
+                        ProductionDate = setting.ProductionDate,
+                        LastUpdate = setting.LastUpdate,
+                        FkESPId = setting.FkESPId,
+                        FkHoltekId = setting.FkHoltekId,
+                        FkOwnerId = setting.FkOwnerId,
+                        FkSTMId = setting.FkSTMId,
+                        HardwareVersion = setting.HardwareVersion,
+                        Path = path,
+                        FkUserRoleId = userRole,
+                        IsActive = true,
+                    };
+                    _context.FOTA.Add(fota_settings);
+                    _context.SaveChanges();
+                    _context.Database.CommitTransaction();
+                    return Result.Ok();
+                }
+                _context.Database.RollbackTransaction();
+                return Result.Fail(ErrorCode.NO_FILE_UPLOADED, "خطا در آپلود فایل!");
+            }catch(Exception)
+            {
+                _context.Database.RollbackTransaction();
+                return Result.Fail(ErrorCode.INTERNAL_ERROR, "خطای سرور!");
+
+            }
+        }
+        #endregion
+
         #region Check
         public FOTADto? Check(FOTADto setting)
         {
             var fota = _context.FOTA
                 .Where(f =>
                     f.Type == setting.Type &&
-                    (f.ProductCategory==null || f.ProductCategory == setting.ProductCategory )&&
-                    (f.FkOwnerId==null || f.FkOwnerId == setting.FkOwnerId) &&
-                    ((f.FkESPId!=null && f.FkESPId == setting.FkESPId )||
-                    (f.FkHoltekId!=null && f.FkHoltekId == setting.FkHoltekId) ||
-                    (f.FkSTMId!=null && f.FkSTMId == setting.FkSTMId ))&&
+                    (f.ProductCategory == null || f.ProductCategory == setting.ProductCategory) &&
+                    (f.FkOwnerId == null || f.FkOwnerId == setting.FkOwnerId) &&
+                    ((f.FkESPId != null && f.FkESPId == setting.FkESPId) ||
+                    (f.FkHoltekId != null && f.FkHoltekId == setting.FkHoltekId) ||
+                    (f.FkSTMId != null && f.FkSTMId == setting.FkSTMId)) &&
                     (f.BatchNumber == null || f.BatchNumber == setting.BatchNumber) &&
                     (f.SerialNumber == null || f.SerialNumber == setting.SerialNumber) &&
                     (f.IMEI == null || f.IMEI == setting.IMEI) &&
@@ -153,8 +212,8 @@ namespace GW.Application.Repository
                 .FirstOrDefault();
             if (fota is not null)
             {
-                if ((fota.ProductionDate==null || fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.GetValueOrDefault().Date)
-                && (fota.LastUpdate==null || fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.GetValueOrDefault().Date))
+                if ((fota.ProductionDate == null || fota.ProductionDate.GetValueOrDefault().Date != setting.ProductionDate.GetValueOrDefault().Date)
+                && (fota.LastUpdate == null || fota.LastUpdate.GetValueOrDefault().Date != setting.LastUpdate.GetValueOrDefault().Date))
                     return null;
             }
             else { return null; }

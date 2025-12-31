@@ -175,6 +175,35 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
+        #region DeactivatePrevSameFiles
+        [HttpPost]
+        public async Task<IActionResult> DeactivatePrevSameFiles([FromForm] UpdateFOTARequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Settings))
+                    return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
+                if (request.File == null || request.File.Length == 0)
+                    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
+
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var data = _userRepository.UserRole(userId, role);
+                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
+                var userRole = data.Data;
+
+
+                var result =await _fotaRepository.InsertAndDeactiveSameFiles(request,userRole.Id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
         #region UploadSoftwareFile
         [HttpPost]
         public async Task<IActionResult> UploadSoftwareFile([FromForm] UploadSoftwareVersion version)
