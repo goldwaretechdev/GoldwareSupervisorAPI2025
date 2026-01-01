@@ -13,7 +13,7 @@ namespace GW.Application.Repository
 {
     public interface ILogRepository
     {
-        public Result Insert(LogDto log);
+        public Task<Result> Insert(LogDto log);
     }
 
 
@@ -32,7 +32,7 @@ namespace GW.Application.Repository
         #endregion
 
         #region Insert
-        public Result Insert(LogDto log)
+        public async Task<Result> Insert(LogDto log)
         {
             _context.Logs.Add(_mapper.Map<Log>(log));
             _context.SaveChanges();

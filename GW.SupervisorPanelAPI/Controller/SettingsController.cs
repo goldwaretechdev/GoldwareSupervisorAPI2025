@@ -1,21 +1,17 @@
-﻿using Azure.Core;
-using GW.Application.Repository;
+﻿using GW.Application.Repository;
 using GW.Application.Sevices;
-using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Enum;
 using GW.Core.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System;
 
 namespace GW.SupervisorPanelAPI.Controller
 {
-    [Route("api/[controller]/[action]" )]
+    [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles ="Development")]
+    [Authorize(Roles = "Development")]
     public class SettingsController : ControllerBase
     {
         private readonly IDeviceRepository _deviceRepository;
@@ -28,11 +24,11 @@ namespace GW.SupervisorPanelAPI.Controller
         private readonly ILogger<SettingsController> _logger;
 
         #region ctor
-        public SettingsController(IDeviceRepository deviceRepository,IBaseData baseData
-            ,IOwnerRepository ownerRepository
-            ,ISoftwareVersionRepository softwareVersion,IUserRepository userRepository
-            ,IFOTARepository fOTARepository
-            ,ILogRepository logRepository,
+        public SettingsController(IDeviceRepository deviceRepository, IBaseData baseData
+            , IOwnerRepository ownerRepository
+            , ISoftwareVersionRepository softwareVersion, IUserRepository userRepository
+            , IFOTARepository fOTARepository
+            , ILogRepository logRepository,
             ILogger<SettingsController> logger)
         {
             _deviceRepository = deviceRepository;
@@ -42,7 +38,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _softwareVersionRepository = softwareVersion;
             _fotaRepository = fOTARepository;
             _logRepository = logRepository;
-            _logger= logger;
+            _logger = logger;
         }
         #endregion
 
@@ -65,7 +61,7 @@ namespace GW.SupervisorPanelAPI.Controller
 
         #region SoftwareVersions
         [HttpPost]
-        public IActionResult SoftwareVersions([FromBody]RequestVersions request)
+        public IActionResult SoftwareVersions([FromBody] RequestVersions request)
         {
             try
             {
@@ -84,33 +80,48 @@ namespace GW.SupervisorPanelAPI.Controller
         [HttpPost]
         public IActionResult SetDeviceSettings([FromBody] SettingDto request)
         {
+            Result<int> result = new();
+            UserRoleDto userRole = new();
             try
             {
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                var data = _userRepository.UserRole(userId, role);
-                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
-                var userRole = data.Data;
-                var result = _deviceRepository.Insert(request,userRole.Id);
-                if (result.Success)
-                {
-                    //save log
-                    LogDto log = new()
-                    {
-                        DateTime = DateTime.Now,
-                        FkDeviceId = result.Data,
-                        FkUserRoleId = userRole.Id,
-                        Type = LogType.SetSettings,
-                    };
-                    var log_result = _logRepository.Insert(log);
-                }
+                userRole = _userRepository.UserRole(userId, role);
+                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                result = _deviceRepository.Insert(request, userRole.Id);
+               
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "SetDeviceSettings Failed by input: {request}", request);
-                return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+            finally
+            {
+                if (result?.Success == true)
+                {
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            LogDto log = new()
+                            {
+                                DateTime = DateTime.Now,
+                                FkDeviceId = result.Data,
+                                FkUserRoleId = userRole.Id,
+                                Type = LogType.SetSettings,
+                                Desc = $"دستگاه با سریال {request.SerialNumber} ثبت شد"
+                            };
+                            var log_result = _logRepository.Insert(log);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Background log failed");
+                        }
+                    });
+                }
             }
         }
         #endregion
@@ -124,16 +135,15 @@ namespace GW.SupervisorPanelAPI.Controller
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                var data = _userRepository.UserRole(userId, role);
-                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
-                var userRole = data.Data;
-                var result = _deviceRepository.Update(request,userRole.Id);
+                var userRole = _userRepository.UserRole(userId, role);
+                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                var result = _deviceRepository.Update(request, userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "UpdateSettings Failed by input: {request}", request);
-                return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
         #endregion
@@ -150,7 +160,7 @@ namespace GW.SupervisorPanelAPI.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GetSettings Failed by input: {request}", serial);
-                return BadRequest(new {ErrorCode.INTERNAL_ERROR, ex.Message});
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
         #endregion
@@ -159,6 +169,8 @@ namespace GW.SupervisorPanelAPI.Controller
         [HttpPost]
         public async Task<IActionResult> FOTA([FromForm] UpdateFOTARequest request)
         {
+            Result result = new();
+            UserRoleDto userRole = new();
             try
             {
                 if (string.IsNullOrEmpty(request.Settings))
@@ -169,18 +181,40 @@ namespace GW.SupervisorPanelAPI.Controller
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                var data = _userRepository.UserRole(userId, role);
-                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
-                var userRole = data.Data;
+                userRole = _userRepository.UserRole(userId, role);
+                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
 
-
-                var result =await _fotaRepository.InsertAsync(request,userRole.Id);
+                result = await _fotaRepository.InsertAsync(request, userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Post FOTA Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+            finally
+            {
+                if (result?.Success == true)
+                {
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            LogDto logDto = new()
+                            {
+                                DateTime = DateTime.Now,
+                                Desc = $"آپلود فایل FOTA انجام شد.",
+                                Type = LogType.Update_FOTA_File,
+                                FkUserRoleId = userRole.Id,
+                            };
+                            var log = _logRepository.Insert(logDto);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Background log failed");
+                        }
+                    });
+                }
             }
         }
         #endregion
@@ -189,6 +223,8 @@ namespace GW.SupervisorPanelAPI.Controller
         [HttpPost]
         public async Task<IActionResult> DeactivatePrevSameFiles([FromForm] UpdateFOTARequest request)
         {
+            Result result = new();
+            UserRoleDto userRole = new();
             try
             {
                 if (string.IsNullOrEmpty(request.Settings))
@@ -199,18 +235,41 @@ namespace GW.SupervisorPanelAPI.Controller
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                var data = _userRepository.UserRole(userId, role);
-                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
-                var userRole = data.Data;
+                userRole = _userRepository.UserRole(userId, role);
+                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
 
+                result = await _fotaRepository.InsertAndDeactiveSameFiles(request, userRole.Id);
 
-                var result =await _fotaRepository.InsertAndDeactiveSameFiles(request,userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "DeactivatePrevSameFiles Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+            finally
+            {
+                if (result?.Success == true)
+                {
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            LogDto logDto = new()
+                            {
+                                DateTime = DateTime.Now,
+                                Desc = $"آپلود فایل FOTA و غیر فعالسازی فایل های مشابه انجام شد.",
+                                Type = LogType.Update_FOTA_File,
+                                FkUserRoleId = userRole.Id,
+                            };
+                            var log = _logRepository.Insert(logDto);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Background log failed");
+                        }
+                    });
+                }
             }
         }
         #endregion
@@ -219,6 +278,8 @@ namespace GW.SupervisorPanelAPI.Controller
         [HttpPost]
         public async Task<IActionResult> UploadSoftwareFile([FromForm] UploadSoftwareVersion version)
         {
+            Result result = new();
+            UserRoleDto userRole = new();
             try
             {
                 if (version.Condition is null)
@@ -229,17 +290,40 @@ namespace GW.SupervisorPanelAPI.Controller
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                var data = _userRepository.UserRole(userId, role);
-                if (!data.Success) return BadRequest(new { data.ErrorCode, data.Message });
-                var userRole = data.Data;
+                userRole = _userRepository.UserRole(userId, role);
+                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
 
-                var result =await _softwareVersionRepository.Insert(version,userRole.Id);
+                result = await _softwareVersionRepository.Insert(version, userRole.Id);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "UploadSoftwareFile Failed by input: {request}", version);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+            finally
+            {
+                if (result?.Success == true)
+                {
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            LogDto logDto = new()
+                            {
+                                DateTime = DateTime.Now,
+                                Desc = $"آپلود فایل Software version انجام شد.",
+                                Type = LogType.Insert_SoftwareVersion_File,
+                                FkUserRoleId = userRole.Id,
+                            };
+                            var log = _logRepository.Insert(logDto);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Background log failed");
+                        }
+                    });
+                }
             }
         }
         #endregion
@@ -248,27 +332,27 @@ namespace GW.SupervisorPanelAPI.Controller
         [HttpPost]
         public IActionResult SoftwareFile([FromBody] int request)
         {
+            Result result = new();
+            UserRoleDto userRole = new();
+            SoftwareVersionDto soft = new();
             try
             {
-                var path = _softwareVersionRepository.File(request);
-                if (string.IsNullOrEmpty(path))
-                {
-                    return BadRequest(ErrorCode.NO_CONTENT);
-                }
+                soft = _softwareVersionRepository.File(request);
+                if (soft is null) return Ok(Result.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر"));
                 else
                 {
-                    if (!System.IO.File.Exists(path))
-                        return NotFound();
-                    string fileName = path.ToString().Split("\\").Last();
+                    if (!System.IO.File.Exists(soft.Path))
+                        return Ok(Result.Fail(ErrorCode.NOT_FOUND, "فایل پیدا نشد!"));
+                    string fileName = soft.Path.ToString().Split("\\").Last();
 
-                    var file = PhysicalFile(path, "application/octet-stream", fileName);
+                    var file = PhysicalFile(soft.Path, "application/octet-stream", fileName);
                     var stream = new FileStream(
-                        path,
+                        soft.Path,
                         FileMode.Open,
                         FileAccess.Read,
                         FileShare.Read
                     );
-
+                    result = Result.Ok();
                     return File(
                         stream,
                         file.ContentType,
@@ -281,6 +365,38 @@ namespace GW.SupervisorPanelAPI.Controller
             {
                 _logger.LogError(ex, "Get SoftwareFile Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+            finally
+            {
+                if (result?.Success == true)
+                {
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            var token = Request.Headers[HeaderNames.Authorization].ToString();
+                            var role = _baseData.GetUserRole(token);
+                            var userId = _baseData.GetUserId(token);
+                            userRole = _userRepository.UserRole(userId, role);
+                            if (userRole is not null)
+                            {
+                                LogDto logDto = new()
+                                {
+                                    DateTime = DateTime.Now,
+                                    Desc = $"programming {soft.MicroType.ToString()}.",
+                                    Type = LogType.Programming,
+                                    FkUserRoleId = userRole.Id,
+                                };
+                                var log = _logRepository.Insert(logDto);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Background log failed");
+                        }
+                    });
+                }
+
             }
         }
         #endregion

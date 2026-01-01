@@ -16,7 +16,8 @@ namespace GW.Application.Repository
     {
         public Result<List<RoleDto>> Login(LoginInfo info);
         public Result<string> Token(LoginInfo info);
-        public Result<UserRoleDto> UserRole(Guid userId,string role);
+        public UserRoleDto? UserRole(Guid userId,string role);
+        public UserRoleDto? UserRoleByLoginInfo(LoginInfo info);
     }
 
     public class UserRepository : IUserRepository
@@ -73,17 +74,33 @@ namespace GW.Application.Repository
         #endregion
 
         #region UserRole
-        public Result<UserRoleDto> UserRole(Guid userId, string role)
+        public UserRoleDto? UserRole(Guid userId, string role)
         {
             var userRole = _context.UserRoles
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == role && u.FkUserId == userId)
                 .FirstOrDefault();
-            if (userRole is null) return Result<UserRoleDto>.Fail(ErrorCode.NOT_FOUND, "کاربری با این مشخصات وجود ندارد!");
-            var result = _mapper.Map<UserRoleDto>(userRole);
-            return Result<UserRoleDto>.Ok(result);
+            if (userRole is null) return null;
+            return _mapper.Map<UserRoleDto>(userRole);
         }
+        #endregion
+
+        #region UserByLoginInfo
+        public UserRoleDto? UserRoleByLoginInfo(LoginInfo info)
+        {
+            var user = _context.Users.Where(u => u.Username == info.UserName).FirstOrDefault();
+            if (user is null) return null;
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(info.Password, user.Password))
+            {
+                return null;
+            }
+            var userRole= _context.UserRoles
+                .Include(u => u.Role)
+                 .Where(u => u.FkUserId == user.Id && u.Role.Name == info.Role).FirstOrDefault();
+            return _mapper.Map<UserRoleDto>(userRole);
+        }
+
         #endregion
     }
 }

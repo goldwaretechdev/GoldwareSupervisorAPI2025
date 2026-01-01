@@ -12,10 +12,12 @@ namespace GW.Core.Models.Enum
         GetSettings=2,
         FOTA_Update_Requested = 3,
         FOTA_Update_Done=4,
-        Programming_ESP=5,
-        Programming_STM=6,
-        Programming_HT=7,
-        Stock = 8,
-        Sale = 9,
+        Update_FOTA_File = 5,
+        Programming=6 ,
+        Stock = 7,
+        Sale = 8,
+        Login = 9,
+        Insert_SoftwareVersion_File = 10,
+
     }
 }

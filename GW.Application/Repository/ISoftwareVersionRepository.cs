@@ -19,7 +19,7 @@ namespace GW.Application.Repository
     public interface ISoftwareVersionRepository
     {
         public Result<CategorizedVersions> CategorizedVersions(RequestVersions request);
-        public string File(int id);
+        public SoftwareVersionDto File(int id);
         public Task<Result> Insert(UploadSoftwareVersion version,int userRoleId);
     }
 
@@ -67,14 +67,14 @@ namespace GW.Application.Repository
         #endregion
 
         #region File
-        public string File(int id)
+        public SoftwareVersionDto? File(int id)
         {
             var softwareVersion = _context.SoftwareVersions
             .Where(s => s.Id == id).FirstOrDefault();
 
-            if (softwareVersion is null) return string.Empty;
+            if (softwareVersion is null) return null;
            
-            return softwareVersion.Path ?? string.Empty;
+            return _mapper.Map<SoftwareVersionDto>(softwareVersion);
         }
         #endregion
 

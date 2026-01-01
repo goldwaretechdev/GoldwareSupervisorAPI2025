@@ -20,6 +20,7 @@ namespace GW.SupervisorPanelAPI.Controller
         private readonly IMemoryCache _cache;
         private readonly ILogger<DeviceManagmentController> _logger;
 
+        #region ctor
         public DeviceManagmentController(IDeviceRepository deviceRepository
             , IBaseData baseData
             , IFOTARepository fOTARepository
@@ -34,6 +35,7 @@ namespace GW.SupervisorPanelAPI.Controller
             _logRepository= logRepository;
             _logger = logger;
         }
+        #endregion
 
         #region Check
         [HttpPost("[action]")]
