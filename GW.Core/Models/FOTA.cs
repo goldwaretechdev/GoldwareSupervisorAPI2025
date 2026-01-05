@@ -23,7 +23,7 @@ namespace GW.Core.Models
         public DateTime? ProductionDate { get; set; }
         public DateTime? LastUpdate { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
-        [MaxLength(50)]
+        [MaxLength(15)]
         public string? HardwareVersion { get; set; }
         [MaxLength(50)]
         public string? MAC { get; set; }

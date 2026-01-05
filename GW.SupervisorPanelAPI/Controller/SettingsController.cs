@@ -167,17 +167,15 @@ namespace GW.SupervisorPanelAPI.Controller
 
         #region FOTA
         [HttpPost]
-        public async Task<IActionResult> FOTA([FromForm] UpdateFOTARequest request)
+        public async Task<IActionResult> FOTA([FromBody] FOTADto request)
         {
             Result result = new();
             UserRoleDto userRole = new();
             try
             {
-                if (string.IsNullOrEmpty(request.Settings))
+                if (request is null)
                     return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
-                if (request.File == null || request.File.Length == 0)
-                    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
-
+              
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
@@ -220,17 +218,17 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region DeactivatePrevSameFiles
-        [HttpPost]
-        public async Task<IActionResult> DeactivatePrevSameFiles([FromForm] UpdateFOTARequest request)
+        [HttpPut]
+        public async Task<IActionResult> DeactivatePrevSameFiles([FromBody] FOTADto request)
         {
             Result result = new();
             UserRoleDto userRole = new();
             try
             {
-                if (string.IsNullOrEmpty(request.Settings))
+                if (request is null)
                     return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
-                if (request.File == null || request.File.Length == 0)
-                    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
+                //if (request.File == null || request.File.Length == 0)
+                //    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
 
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
                 var role = _baseData.GetUserRole(token);

@@ -57,7 +57,8 @@ namespace GW.Application.Repository
                     case MicroType.STM:
                         categorized.STM.Add(new() { Value = item.Id, Text = item.Version });
                         break;
-                    case MicroType.ESP:
+                    case MicroType.ESP_32:
+                    case MicroType.ESP_8266:
                         categorized.ESP.Add(new() { Value = item.Id, Text = item.Version });
                         break;
                 }
@@ -97,6 +98,8 @@ namespace GW.Application.Repository
                     DeviceType=condition.DeviceType,
                     Category = condition.Category,
                     MicroType = condition.MicroType,
+                    MinHardwareVersion = condition.MinHardwareVersion,
+                    MaxHardwareVersion = condition.MaxHardwareVersion,
                     DateTime = DateTime.Now,
                     Version =condition.Version,
                     Path = path,

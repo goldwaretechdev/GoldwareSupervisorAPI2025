@@ -127,8 +127,8 @@ namespace GW.Core.Migrations
 
                     b.Property<string>("HardwareVersion")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("IMEI")
                         .HasMaxLength(50)
@@ -211,8 +211,8 @@ namespace GW.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("HardwareVersion")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("IMEI")
                         .HasMaxLength(50)
@@ -353,8 +353,21 @@ namespace GW.Core.Migrations
                     b.Property<int>("FkUserRoleId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MaxHardwareVersion")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<int>("MicroType")
                         .HasColumnType("int");
+
+                    b.Property<string>("MinHardwareVersion")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Path")
                         .IsRequired()
@@ -362,82 +375,14 @@ namespace GW.Core.Migrations
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FkUserRoleId");
 
                     b.ToTable("SoftwareVersions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 3,
-                            Path = "",
-                            Version = "ESP01"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 3,
-                            Path = "",
-                            Version = "ESP02"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 1,
-                            Path = "",
-                            Version = "HT01"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 1,
-                            Path = "",
-                            Version = "HT02"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 2,
-                            Path = "",
-                            Version = "STM01"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Category = 1,
-                            DateTime = new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local),
-                            DeviceType = 1,
-                            FkUserRoleId = 1,
-                            MicroType = 2,
-                            Path = "",
-                            Version = "STM02"
-                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.Unit", b =>

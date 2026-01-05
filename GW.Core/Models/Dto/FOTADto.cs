@@ -12,7 +12,7 @@ namespace GW.Core.Models.Dto
     {
         public int Id { get; set; }
         public DeviceType Type { get; set; }
-        public string Path { get; set; }
+        public string? Path { get; set; }
         public ProductCategory? ProductCategory { get; set; }
         [MaxLength(50)]
         public string? BatchNumber { get; set; }

@@ -18,7 +18,7 @@ namespace GW.Core.Models
         public string? SerialNumber { get; set; }
         public DateTime ProductionDate { get; set; }
         public DateTime LastUpdate { get; set; }
-        [MaxLength(10)]
+        [MaxLength(15)]
         public string HardwareVersion { get; set; }
         [MaxLength(50)]
         public string? MAC { get; set; }

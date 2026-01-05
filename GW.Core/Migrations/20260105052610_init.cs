@@ -157,12 +157,15 @@ namespace GW.Core.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Version = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Version = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     MicroType = table.Column<int>(type: "int", nullable: false),
                     DeviceType = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MinHardwareVersion = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    MaxHardwareVersion = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     FkUserRoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -190,13 +193,14 @@ namespace GW.Core.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    HardwareVersion = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    HardwareVersion = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     FkOwnerId = table.Column<int>(type: "int", nullable: false),
                     FkESPId = table.Column<int>(type: "int", nullable: false),
                     FkSTMId = table.Column<int>(type: "int", nullable: false),
-                    FkHoltekId = table.Column<int>(type: "int", nullable: false)
+                    FkHoltekId = table.Column<int>(type: "int", nullable: false),
+                    FkUserRoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -225,6 +229,12 @@ namespace GW.Core.Migrations
                         principalTable: "SoftwareVersions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Devices_UserRoles_FkUserRoleId",
+                        column: x => x.FkUserRoleId,
+                        principalTable: "UserRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,9 +252,10 @@ namespace GW.Core.Migrations
                     ProductionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    HardwareVersion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    HardwareVersion = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     FkOwnerId = table.Column<int>(type: "int", nullable: true),
                     FkESPId = table.Column<int>(type: "int", nullable: true),
                     FkSTMId = table.Column<int>(type: "int", nullable: true),
@@ -295,8 +306,8 @@ namespace GW.Core.Migrations
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Desc = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    FkDeviceId = table.Column<int>(type: "int", nullable: false),
-                    FkUserRoleId = table.Column<int>(type: "int", nullable: false)
+                    FkDeviceId = table.Column<int>(type: "int", nullable: true),
+                    FkUserRoleId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -345,19 +356,6 @@ namespace GW.Core.Migrations
                 columns: new[] { "Id", "FkRoleId", "FkUserId" },
                 values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
 
-            migrationBuilder.InsertData(
-                table: "SoftwareVersions",
-                columns: new[] { "Id", "Category", "DateTime", "DeviceType", "FkUserRoleId", "MicroType", "Path", "Version" },
-                values: new object[,]
-                {
-                    { 1, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 3, "", "ESP01" },
-                    { 2, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 3, "", "ESP02" },
-                    { 3, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 1, "", "HT01" },
-                    { 4, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 1, "", "HT02" },
-                    { 5, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 2, "", "STM01" },
-                    { 6, 1, new DateTime(2025, 12, 11, 13, 0, 0, 0, DateTimeKind.Local), 1, 1, 2, "", "STM02" }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Access_FkUnitId",
                 table: "Access",
@@ -387,6 +385,11 @@ namespace GW.Core.Migrations
                 name: "IX_Devices_FkSTMId",
                 table: "Devices",
                 column: "FkSTMId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Devices_FkUserRoleId",
+                table: "Devices",
+                column: "FkUserRoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FOTA_FkESPId",

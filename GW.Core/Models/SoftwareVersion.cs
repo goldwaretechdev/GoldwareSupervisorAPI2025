@@ -12,16 +12,22 @@ namespace GW.Core.Models
     {
         [Key]
         public int Id { get; set; }
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
         public ProductCategory Category { get; set; }
         public string Path { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
+        [MaxLength(15)]
+        public string MinHardwareVersion { get; set; }
+        [MaxLength(15)]
+        public string MaxHardwareVersion { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public UserRoles UserRoles { get; set; }
         public int FkUserRoleId { get; set; }
+
 
         public ICollection<Device> ESPVersions { get; set; }
         public ICollection<Device> STMVersions { get; set; }

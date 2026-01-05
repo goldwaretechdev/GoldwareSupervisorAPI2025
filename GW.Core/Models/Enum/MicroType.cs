@@ -10,6 +10,7 @@ namespace GW.Core.Models.Enum
     {
         Holtek = 1,
         STM = 2,
-        ESP = 3
+        ESP_8266 = 3,
+        ESP_32 = 4,
     }
 }

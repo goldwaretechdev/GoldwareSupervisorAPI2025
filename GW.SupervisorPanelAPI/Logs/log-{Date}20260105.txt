@@ -1,0 +1,11 @@
+2026-01-05 08:56:39.122 +03:30 [ERR] Failed executing DbCommand (53ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Company] (
+    [Id] int NOT NULL IDENTITY,
+    [Name] nvarchar(150) NOT NULL,
+    [ShortName] nvarchar(50) NOT NULL,
+    [Icon] nvarchar(max) NULL,
+    [Charge] int NOT NULL,
+    [CreatedOn] datetime2 NOT NULL,
+    [UpdatedOn] datetime2 NULL,
+    CONSTRAINT [PK_Company] PRIMARY KEY ([Id])
+);

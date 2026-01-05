@@ -13,13 +13,16 @@ namespace GW.Core.Models.Dto
     public class SoftwareVersionDto
     {
         public int Id { get; set; }
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
         public ProductCategory Category { get; set; }
         //todo category
         public string Path { get; set; }
+        public string MinHardwareVersion { get; set; }
+        public string MaxHardwareVersion { get; set; }
+
 
     }
 
@@ -30,11 +33,13 @@ namespace GW.Core.Models.Dto
     }
     public class VersionConditions
     {
-        [MaxLength(50)]
+        [MaxLength(20)]
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
         public ProductCategory Category { get; set; }
+        public string MinHardwareVersion { get; set; }
+        public string MaxHardwareVersion { get; set; }
     }
 
     public class RequestVersions
