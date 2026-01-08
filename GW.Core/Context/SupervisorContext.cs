@@ -20,31 +20,18 @@ namespace GW.Core.Context
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Access> Access { get; set; }
         public DbSet<Company> Company { get; set; }
         public DbSet<FOTA> FOTA { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<SoftwareVersion> SoftwareVersions { get; set; }
-        public DbSet<Unit> Units { get; set; }
         public DbSet<UserAndCompany> UserAndCompany { get; set; }
         public DbSet<Device> Devices { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Access>()
-                .HasOne(a=>a.User)
-                .WithMany(u=>u.Access)
-                .HasForeignKey(a=>a.FkUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
-            builder.Entity<Access>()
-                .HasOne(a=>a.Unit)
-                .WithMany(u=>u.Access)
-                .HasForeignKey(a=>a.FkUnitId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
+           
             builder.Entity<Device>()
                 .HasOne(a=>a.ProductOwner)
                 .WithMany(u=>u.Devices)
@@ -212,6 +199,15 @@ namespace GW.Core.Context
                     CreatedOn = SeedDate,
                 }               
             );
+
+
+            builder.Entity<UserAndCompany>().HasData(
+                new UserAndCompany
+                {
+                    Id = 1,
+                    FkCompanyId = 1,
+                    FkUserId = SeedUserId
+                });
 
             //builder.Entity<SoftwareVersion>().HasData(
             //    new SoftwareVersion()

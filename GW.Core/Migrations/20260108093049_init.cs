@@ -45,19 +45,6 @@ namespace GW.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Units",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Units", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -71,32 +58,6 @@ namespace GW.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Access",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FkUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FkUnitId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Access", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Access_Units_FkUnitId",
-                        column: x => x.FkUnitId,
-                        principalTable: "Units",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Access_Users_FkUserId",
-                        column: x => x.FkUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -157,7 +118,7 @@ namespace GW.Core.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Version = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Version = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     MicroType = table.Column<int>(type: "int", nullable: false),
                     DeviceType = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),
@@ -197,9 +158,9 @@ namespace GW.Core.Migrations
                     MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     FkOwnerId = table.Column<int>(type: "int", nullable: false),
-                    FkESPId = table.Column<int>(type: "int", nullable: false),
-                    FkSTMId = table.Column<int>(type: "int", nullable: false),
-                    FkHoltekId = table.Column<int>(type: "int", nullable: false),
+                    FkESPId = table.Column<int>(type: "int", nullable: true),
+                    FkSTMId = table.Column<int>(type: "int", nullable: true),
+                    FkHoltekId = table.Column<int>(type: "int", nullable: true),
                     FkUserRoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -352,19 +313,14 @@ namespace GW.Core.Migrations
                 values: new object[] { new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"), "s", "hasanabadi", "09155909973", "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6", "sdh" });
 
             migrationBuilder.InsertData(
+                table: "UserAndCompany",
+                columns: new[] { "Id", "FkCompanyId", "FkUserId" },
+                values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
+
+            migrationBuilder.InsertData(
                 table: "UserRoles",
                 columns: new[] { "Id", "FkRoleId", "FkUserId" },
                 values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Access_FkUnitId",
-                table: "Access",
-                column: "FkUnitId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Access_FkUserId",
-                table: "Access",
-                column: "FkUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Devices_FkESPId",
@@ -456,9 +412,6 @@ namespace GW.Core.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Access");
-
-            migrationBuilder.DropTable(
                 name: "FOTA");
 
             migrationBuilder.DropTable(
@@ -466,9 +419,6 @@ namespace GW.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserAndCompany");
-
-            migrationBuilder.DropTable(
-                name: "Units");
 
             migrationBuilder.DropTable(
                 name: "Devices");

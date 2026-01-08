@@ -28,14 +28,14 @@ namespace GW.Core.Models
         public Company ProductOwner { get; set; }
         public int FkOwnerId { get; set; }
 
-        public SoftwareVersion ESP { get; set; }
-        public int FkESPId { get; set; }
+        public SoftwareVersion? ESP { get; set; }
+        public int? FkESPId { get; set; }
 
-        public SoftwareVersion STM { get; set; }
-        public int FkSTMId { get; set; }
+        public SoftwareVersion? STM { get; set; }
+        public int? FkSTMId { get; set; }
         
-        public SoftwareVersion Holtek { get; set; }
-        public int FkHoltekId { get; set; }
+        public SoftwareVersion? Holtek { get; set; }
+        public int? FkHoltekId { get; set; }
 
         public UserRoles UserRoles { get; set; }
         public int FkUserRoleId { get; set; }

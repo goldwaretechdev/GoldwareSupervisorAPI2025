@@ -51,10 +51,11 @@ namespace GW.Application.Repository
             {
                 switch (item.MicroType)
                 {
-                    case MicroType.Holtek:
+                    case MicroType.Holtek_66F340C:
+                    case MicroType.Holtek_BS84B04C:
                         categorized.Holtek.Add(new() { Value = item.Id,Text =item.Version});
                         break;
-                    case MicroType.STM:
+                    case MicroType.STM_32:
                         categorized.STM.Add(new() { Value = item.Id, Text = item.Version });
                         break;
                     case MicroType.ESP_32:

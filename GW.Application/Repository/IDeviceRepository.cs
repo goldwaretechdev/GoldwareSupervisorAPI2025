@@ -14,6 +14,7 @@ namespace GW.Application.Repository
         public Result<int> Insert(SettingDto setting, int userRoleId);
         public Result Update(SettingDto setting, int userRoleId);
         public Result<SettingDto> GetSettings(string serial);
+        public Result<List<SettingDto>> GetAllSettings(Guid userId);
         public Result<DeviceDto> GetDeviceByUniqueId(string id);
     }
 
@@ -101,6 +102,48 @@ namespace GW.Application.Repository
                 return Result<SettingDto>.Fail(ErrorCode.NOT_FOUND, "سریال وارد شده صحیح نیست!");
             result = _mapper.Map<SettingDto>(check);
             return Result<SettingDto>.Ok(result);
+        }
+        #endregion        
+
+        #region GetAllSettings
+        public Result<List<SettingDto>> GetAllSettings(Guid userId)
+        {
+            var company = _context.UserAndCompany
+                .Where(u => u.FkUserId == userId).FirstOrDefault();
+            if (company is null) return Result<List<SettingDto>>.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!");
+            List<SettingDto> result = new();
+            var check = _context.Devices
+                .AsNoTracking()
+                .Include(d => d.ProductOwner)
+                .Include(d => d.STM)
+                .Include(d => d.ESP)
+                .Include(d => d.Holtek)
+                .Where(d=>d.FkOwnerId==company.FkCompanyId)
+                .OrderByDescending(d => d.ProductionDate)
+                .Take(20);
+            foreach (var item in check)
+                result.Add(new()
+                {
+                    UniqueId = item.UniqueId,
+                    BatchNumber = item.BatchNumber,
+                    SerialNumber = item.SerialNumber,
+                    ProductCategory = item.ProductCategory,
+                    Type = item.Type,
+                    ProductionDate = item.ProductionDate,
+                    LastUpdate=item.LastUpdate,
+                    FkOwnerId=item.FkOwnerId,
+                    OwnerName = item.ProductOwner.Name,
+                    FkESPId = item.FkESPId,
+                    ESPVersion = item.ESP?.Version,
+                    FkHoltekId = item.FkHoltekId,
+                    HoltekVersion = item.Holtek?.Version,
+                    FkSTMId = item.FkSTMId,
+                    STMVersion = item.STM?.Version,
+                    HardwareVersion = item.HardwareVersion,
+                    MAC = item.MAC,
+                    IMEI=item.IMEI,
+                });
+            return Result<List<SettingDto>>.Ok(result);
         }
         #endregion
 

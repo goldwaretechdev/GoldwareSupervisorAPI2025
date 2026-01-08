@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GW.Core.Migrations
 {
     [DbContext(typeof(SupervisorContext))]
-    [Migration("20260105052610_init")]
+    [Migration("20260108093049_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,29 +24,6 @@ namespace GW.Core.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GW.Core.Models.Access", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FkUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("FkUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FkUnitId");
-
-                    b.HasIndex("FkUserId");
-
-                    b.ToTable("Access");
-                });
 
             modelBuilder.Entity("GW.Core.Models.Company", b =>
                 {
@@ -113,16 +90,16 @@ namespace GW.Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("FkESPId")
+                    b.Property<int?>("FkESPId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FkHoltekId")
+                    b.Property<int?>("FkHoltekId")
                         .HasColumnType("int");
 
                     b.Property<int>("FkOwnerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FkSTMId")
+                    b.Property<int?>("FkSTMId")
                         .HasColumnType("int");
 
                     b.Property<int>("FkUserRoleId")
@@ -378,32 +355,14 @@ namespace GW.Core.Migrations
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FkUserRoleId");
 
                     b.ToTable("SoftwareVersions");
-                });
-
-            modelBuilder.Entity("GW.Core.Models.Unit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("GW.Core.Models.User", b =>
@@ -474,6 +433,14 @@ namespace GW.Core.Migrations
                     b.HasIndex("FkUserId");
 
                     b.ToTable("UserAndCompany");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FkCompanyId = 1,
+                            FkUserId = new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05")
+                        });
                 });
 
             modelBuilder.Entity("GW.Core.Models.UserRoles", b =>
@@ -507,38 +474,17 @@ namespace GW.Core.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GW.Core.Models.Access", b =>
-                {
-                    b.HasOne("GW.Core.Models.Unit", "Unit")
-                        .WithMany("Access")
-                        .HasForeignKey("FkUnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("GW.Core.Models.User", "User")
-                        .WithMany("Access")
-                        .HasForeignKey("FkUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Unit");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("GW.Core.Models.Device", b =>
                 {
                     b.HasOne("GW.Core.Models.SoftwareVersion", "ESP")
                         .WithMany("ESPVersions")
                         .HasForeignKey("FkESPId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GW.Core.Models.SoftwareVersion", "Holtek")
                         .WithMany("HoltekVersions")
                         .HasForeignKey("FkHoltekId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GW.Core.Models.Company", "ProductOwner")
                         .WithMany("Devices")
@@ -549,8 +495,7 @@ namespace GW.Core.Migrations
                     b.HasOne("GW.Core.Models.SoftwareVersion", "STM")
                         .WithMany("STMVersions")
                         .HasForeignKey("FkSTMId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("GW.Core.Models.UserRoles", "UserRoles")
                         .WithMany("Devices")
@@ -708,15 +653,8 @@ namespace GW.Core.Migrations
                     b.Navigation("STMVersions");
                 });
 
-            modelBuilder.Entity("GW.Core.Models.Unit", b =>
-                {
-                    b.Navigation("Access");
-                });
-
             modelBuilder.Entity("GW.Core.Models.User", b =>
                 {
-                    b.Navigation("Access");
-
                     b.Navigation("UserAndCompanies");
 
                     b.Navigation("UserRoles");

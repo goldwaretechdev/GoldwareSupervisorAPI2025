@@ -14,15 +14,17 @@ namespace GW.Application.Mapper
         public DeviceProfile()
         {
             CreateMap<SettingDto, Device>();
-            CreateMap<Device, SettingDto>()
-                .ForPath(dst => dst.OwnerName, opt =>
-                opt.MapFrom(src => src.ProductOwner.Name))
-                .ForPath(dst => dst.ESPVersion, opt =>
-                opt.MapFrom(src => src.ESP.Version))
-                .ForPath(dst => dst.STMVersion, opt =>
-                opt.MapFrom(src => src.STM.Version))
-                .ForPath(dst => dst.HoltekVersion, opt =>
-                opt.MapFrom(src => src.Holtek.Version));
+            //CreateMap<Device, SettingDto>()
+            //.ForPath(dest => dest.OwnerName,
+            //    opt => opt.MapFrom(src => src.ProductOwner.Name))
+            //.ForPath(dest => dest.OwnerName,
+            //    opt => opt.MapFrom(src => src.ProductOwner.Name))
+            //.ForPath(dest => dest.ESPVersion,
+            //    opt => opt.MapFrom(src => src.ESP != null ? src.ESP.Version : string.Empty))
+            //.ForPath(dest => dest.STMVersion,
+            //    opt => opt.MapFrom(src => src.STM != null ? src.STM.Version : string.Empty))
+            //.ForPath(dest => dest.HoltekVersion,
+            //    opt => opt.MapFrom(src => src.Holtek != null ? src.Holtek.Version : string.Empty));
             CreateMap<Device, DeviceDto>();
                 
         }

@@ -13,7 +13,7 @@ namespace GW.Core.Models.Dto
     public class SoftwareVersionDto
     {
         public int Id { get; set; }
-        [MaxLength(20)]
+        [MaxLength(30)]
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }
@@ -33,7 +33,7 @@ namespace GW.Core.Models.Dto
     }
     public class VersionConditions
     {
-        [MaxLength(20)]
+        [MaxLength(30)]
         public string Version { get; set; }
         public MicroType MicroType { get; set; }
         public DeviceType DeviceType { get; set; }

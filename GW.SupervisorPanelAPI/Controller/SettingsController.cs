@@ -164,6 +164,26 @@ namespace GW.SupervisorPanelAPI.Controller
             }
         }
         #endregion
+        
+        #region GetAllSettings
+        [HttpGet]
+        public IActionResult AllSettings()
+        {
+            try
+            {
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var result = _deviceRepository.GetAllSettings(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetAllSettings Failed");
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
 
         #region FOTA
         [HttpPost]

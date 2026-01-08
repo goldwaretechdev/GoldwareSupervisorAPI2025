@@ -26,12 +26,12 @@ namespace GW.Core.Models.Dto
         public string? IMEI { get; set; }                                            //108
         public int FkOwnerId { get; set; }                                           //109
         public string OwnerName { get; set; }                                        //110
-        public int FkESPId { get; set; }                                             //111
-        public string ESPVersion { get; set; }                                       //112
-        public int FkSTMId { get; set; }                                             //113
-        public string STMVersion { get; set; }                                       //114
-        public int FkHoltekId { get; set; }                                          //115
-        public string HoltekVersion { get; set; }                                    //116
+        public int? FkESPId { get; set; }                                             //111
+        public string? ESPVersion { get; set; }                                       //112
+        public int? FkSTMId { get; set; }                                             //113
+        public string? STMVersion { get; set; }                                       //114
+        public int? FkHoltekId { get; set; }                                          //115
+        public string? HoltekVersion { get; set; }                                    //116
     }
 
     public class UpdateFOTARequest
