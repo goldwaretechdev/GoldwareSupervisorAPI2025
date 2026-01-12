@@ -35,6 +35,9 @@ namespace GW.Core.Models
         public Company? ProductOwner { get; set; }
         public int? FkOwnerId { get; set; }
 
+        public Company MainOwner { get; set; }
+        public int FkMainOwnerId { get; set; }
+
         public SoftwareVersion? ESP { get; set; }
         public int? FkESPId { get; set; }
 

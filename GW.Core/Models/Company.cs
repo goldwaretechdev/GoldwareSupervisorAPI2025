@@ -20,9 +20,11 @@ namespace GW.Core.Models
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime? UpdatedOn { get; set; }
 
-        public ICollection<Device> Devices { get; set; }
-        public ICollection<UserAndCompany> UserAndCompanies { get; set; }
-        public ICollection<FOTA> FOTAs { get; set; }
+        public ICollection<Device> OwnerDevices { get; set; }
+        public ICollection<Device> MainOwnerDevices { get; set; }
+        public ICollection<User> Users { get; set; }
+        public ICollection<FOTA> OwnerFOTAs { get; set; }
+        public ICollection<FOTA> MainOwnerFOTAs { get; set; }
 
     }
 }

@@ -19,9 +19,10 @@ namespace GW.Core.Models
         [MaxLength(15)]
         public string Mobile { get; set; }
 
+        public Company Company { get; set; }
+        public int FkCompanyId { get; set; }
 
         public ICollection<UserRoles> UserRoles { get; set; }
-        public ICollection<UserAndCompany> UserAndCompanies { get; set; }
 
 
     }

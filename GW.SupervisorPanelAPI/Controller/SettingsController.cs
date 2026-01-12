@@ -85,11 +85,11 @@ namespace GW.SupervisorPanelAPI.Controller
             try
             {
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
-                var role = _baseData.GetUserRole(token);
+                //var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                userRole = _userRepository.UserRole(userId, role);
-                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
-                result = _deviceRepository.Insert(request, userRole.Id);
+                //userRole = _userRepository.UserRole(userId, role);
+                //if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                result = _deviceRepository.Insert(request,userId);
                
                 return Ok(result);
             }
@@ -185,112 +185,6 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-        #region FOTA
-        [HttpPost]
-        public async Task<IActionResult> FOTA([FromBody] FOTADto request)
-        {
-            Result result = new();
-            UserRoleDto userRole = new();
-            try
-            {
-                if (request is null)
-                    return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
-              
-                var token = Request.Headers[HeaderNames.Authorization].ToString();
-                var role = _baseData.GetUserRole(token);
-                var userId = _baseData.GetUserId(token);
-                userRole = _userRepository.UserRole(userId, role);
-                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
-
-                result = await _fotaRepository.InsertAsync(request, userRole.Id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Post FOTA Failed by input: {request}", request);
-                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
-            }
-            finally
-            {
-                if (result?.Success == true)
-                {
-                    _ = Task.Run(() =>
-                    {
-                        try
-                        {
-                            LogDto logDto = new()
-                            {
-                                DateTime = DateTime.Now,
-                                Desc = $"آپلود فایل FOTA انجام شد.",
-                                Type = LogType.Update_FOTA_File,
-                                FkUserRoleId = userRole.Id,
-                            };
-                            var log = _logRepository.Insert(logDto);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Background log failed");
-                        }
-                    });
-                }
-            }
-        }
-        #endregion
-
-        #region DeactivatePrevSameFiles
-        [HttpPut]
-        public async Task<IActionResult> DeactivatePrevSameFiles([FromBody] FOTADto request)
-        {
-            Result result = new();
-            UserRoleDto userRole = new();
-            try
-            {
-                if (request is null)
-                    return BadRequest(Result.Fail(ErrorCode.NO_CONTENT, "خطای تنظیمات!"));
-                //if (request.File == null || request.File.Length == 0)
-                //    return BadRequest(Result.Fail(ErrorCode.NO_FILE_UPLOADED, "هیچ فایلی آپلود نشده است!"));
-
-                var token = Request.Headers[HeaderNames.Authorization].ToString();
-                var role = _baseData.GetUserRole(token);
-                var userId = _baseData.GetUserId(token);
-                userRole = _userRepository.UserRole(userId, role);
-                if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
-
-                result = await _fotaRepository.InsertAndDeactiveSameFiles(request, userRole.Id);
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "DeactivatePrevSameFiles Failed by input: {request}", request);
-                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
-            }
-            finally
-            {
-                if (result?.Success == true)
-                {
-                    _ = Task.Run(() =>
-                    {
-                        try
-                        {
-                            LogDto logDto = new()
-                            {
-                                DateTime = DateTime.Now,
-                                Desc = $"آپلود فایل FOTA و غیر فعالسازی فایل های مشابه انجام شد.",
-                                Type = LogType.Update_FOTA_File,
-                                FkUserRoleId = userRole.Id,
-                            };
-                            var log = _logRepository.Insert(logDto);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Background log failed");
-                        }
-                    });
-                }
-            }
-        }
-        #endregion
 
         #region UploadSoftwareFile
         [HttpPost]

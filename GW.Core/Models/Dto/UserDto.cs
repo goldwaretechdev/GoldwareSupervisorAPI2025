@@ -14,6 +14,7 @@ namespace GW.Core.Models.Dto
         public string FName { get; set; }
         public string LName { get; set; }
         public string Mobile { get; set; }
+        public int FkCompanyId { get; set; }
     }
 
 

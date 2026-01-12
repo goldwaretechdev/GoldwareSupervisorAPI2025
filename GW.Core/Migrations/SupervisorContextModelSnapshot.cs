@@ -93,6 +93,9 @@ namespace GW.Core.Migrations
                     b.Property<int?>("FkHoltekId")
                         .HasColumnType("int");
 
+                    b.Property<int>("FkMainOwnerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("FkOwnerId")
                         .HasColumnType("int");
 
@@ -145,6 +148,8 @@ namespace GW.Core.Migrations
 
                     b.HasIndex("FkHoltekId");
 
+                    b.HasIndex("FkMainOwnerId");
+
                     b.HasIndex("FkOwnerId");
 
                     b.HasIndex("FkSTMId");
@@ -176,6 +181,9 @@ namespace GW.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("FkHoltekId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FkMainOwnerId")
                         .HasColumnType("int");
 
                     b.Property<int?>("FkOwnerId")
@@ -227,6 +235,8 @@ namespace GW.Core.Migrations
                     b.HasIndex("FkESPId");
 
                     b.HasIndex("FkHoltekId");
+
+                    b.HasIndex("FkMainOwnerId");
 
                     b.HasIndex("FkOwnerId");
 
@@ -373,6 +383,9 @@ namespace GW.Core.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("FkCompanyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -395,6 +408,8 @@ namespace GW.Core.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FkCompanyId");
+
                     b.ToTable("Users");
 
                     b.HasData(
@@ -402,41 +417,11 @@ namespace GW.Core.Migrations
                         {
                             Id = new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"),
                             FName = "s",
+                            FkCompanyId = 1,
                             LName = "hasanabadi",
                             Mobile = "09155909973",
                             Password = "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6",
                             Username = "sdh"
-                        });
-                });
-
-            modelBuilder.Entity("GW.Core.Models.UserAndCompany", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FkCompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("FkUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FkCompanyId");
-
-                    b.HasIndex("FkUserId");
-
-                    b.ToTable("UserAndCompany");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FkCompanyId = 1,
-                            FkUserId = new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05")
                         });
                 });
 
@@ -483,8 +468,14 @@ namespace GW.Core.Migrations
                         .HasForeignKey("FkHoltekId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("GW.Core.Models.Company", "MainOwner")
+                        .WithMany("MainOwnerDevices")
+                        .HasForeignKey("FkMainOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GW.Core.Models.Company", "ProductOwner")
-                        .WithMany("Devices")
+                        .WithMany("OwnerDevices")
                         .HasForeignKey("FkOwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -503,6 +494,8 @@ namespace GW.Core.Migrations
                     b.Navigation("ESP");
 
                     b.Navigation("Holtek");
+
+                    b.Navigation("MainOwner");
 
                     b.Navigation("ProductOwner");
 
@@ -523,8 +516,14 @@ namespace GW.Core.Migrations
                         .HasForeignKey("FkHoltekId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("GW.Core.Models.Company", "MainOwner")
+                        .WithMany("MainOwnerFOTAs")
+                        .HasForeignKey("FkMainOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GW.Core.Models.Company", "ProductOwner")
-                        .WithMany("FOTAs")
+                        .WithMany("OwnerFOTAs")
                         .HasForeignKey("FkOwnerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -542,6 +541,8 @@ namespace GW.Core.Migrations
                     b.Navigation("ESP");
 
                     b.Navigation("Holtek");
+
+                    b.Navigation("MainOwner");
 
                     b.Navigation("ProductOwner");
 
@@ -578,23 +579,15 @@ namespace GW.Core.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("GW.Core.Models.UserAndCompany", b =>
+            modelBuilder.Entity("GW.Core.Models.User", b =>
                 {
                     b.HasOne("GW.Core.Models.Company", "Company")
-                        .WithMany("UserAndCompanies")
+                        .WithMany("Users")
                         .HasForeignKey("FkCompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GW.Core.Models.User", "User")
-                        .WithMany("UserAndCompanies")
-                        .HasForeignKey("FkUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Company");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GW.Core.Models.UserRoles", b =>
@@ -618,11 +611,15 @@ namespace GW.Core.Migrations
 
             modelBuilder.Entity("GW.Core.Models.Company", b =>
                 {
-                    b.Navigation("Devices");
+                    b.Navigation("MainOwnerDevices");
 
-                    b.Navigation("FOTAs");
+                    b.Navigation("MainOwnerFOTAs");
 
-                    b.Navigation("UserAndCompanies");
+                    b.Navigation("OwnerDevices");
+
+                    b.Navigation("OwnerFOTAs");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("GW.Core.Models.Device", b =>
@@ -652,8 +649,6 @@ namespace GW.Core.Migrations
 
             modelBuilder.Entity("GW.Core.Models.User", b =>
                 {
-                    b.Navigation("UserAndCompanies");
-
                     b.Navigation("UserRoles");
                 });
 

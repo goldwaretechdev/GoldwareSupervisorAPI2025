@@ -16,6 +16,8 @@ namespace GW.Application.Mapper
             CreateMap<UserRoles, UserRoleDto>()
                 .ForPath(dst => dst.Role, opt =>
                 opt.MapFrom(src => src.Role.Name));
+
+            CreateMap<User, UserDto>();
         }
     }
 }

@@ -1,21 +1,15 @@
 ﻿using GW.Core.Models;
-using GW.Core.Models.Enum;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GW.Core.Context
 {
-    public class SupervisorContext:DbContext
+    public class SupervisorContext : DbContext
     {
         private static readonly Guid SeedUserId = Guid.Parse("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05");
         private static readonly DateTime SeedDate = DateTime.Parse("2025-12-11T09:30:00Z");
         private static readonly int SeedUserRoleId = 1;
 
-        public SupervisorContext(DbContextOptions<SupervisorContext> options):base(options) { }
+        public SupervisorContext(DbContextOptions<SupervisorContext> options) : base(options) { }
 
 
         public DbSet<User> Users { get; set; }
@@ -25,113 +19,120 @@ namespace GW.Core.Context
         public DbSet<Log> Logs { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<SoftwareVersion> SoftwareVersions { get; set; }
-        public DbSet<UserAndCompany> UserAndCompany { get; set; }
         public DbSet<Device> Devices { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-           
+
             builder.Entity<Device>()
-                .HasOne(a=>a.ProductOwner)
-                .WithMany(u=>u.Devices)
-                .HasForeignKey(a=>a.FkOwnerId)
+                .HasOne(a => a.ProductOwner)
+                .WithMany(u => u.OwnerDevices)
+                .HasForeignKey(a => a.FkOwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+
             builder.Entity<Device>()
-                .HasOne(a=>a.ESP)
-                .WithMany(u=>u.ESPVersions)
-                .HasForeignKey(a=>a.FkESPId)
+                .HasOne(a => a.MainOwner)
+                .WithMany(u => u.MainOwnerDevices)
+                .HasForeignKey(a => a.FkMainOwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Device>()
-                .HasOne(a=>a.STM)
-                .WithMany(u=>u.STMVersions)
-                .HasForeignKey(a=>a.FkSTMId)
+                .HasOne(a => a.ESP)
+                .WithMany(u => u.ESPVersions)
+                .HasForeignKey(a => a.FkESPId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Device>()
-                .HasOne(a=>a.Holtek)
-                .WithMany(u=>u.HoltekVersions)
-                .HasForeignKey(a=>a.FkHoltekId)
+                .HasOne(a => a.STM)
+                .WithMany(u => u.STMVersions)
+                .HasForeignKey(a => a.FkSTMId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Device>()
-                .HasOne(a=>a.UserRoles)
-                .WithMany(u=>u.Devices)
-                .HasForeignKey(a=>a.FkUserRoleId)
+                .HasOne(a => a.Holtek)
+                .WithMany(u => u.HoltekVersions)
+                .HasForeignKey(a => a.FkHoltekId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+            builder.Entity<Device>()
+                .HasOne(a => a.UserRoles)
+                .WithMany(u => u.Devices)
+                .HasForeignKey(a => a.FkUserRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<FOTA>()
-                .HasOne(a=>a.ProductOwner)
-                .WithMany(u=>u.FOTAs)
-                .HasForeignKey(a=>a.FkOwnerId)
+                .HasOne(a => a.ProductOwner)
+                .WithMany(u => u.OwnerFOTAs)
+                .HasForeignKey(a => a.FkOwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
-             
+
+
             builder.Entity<FOTA>()
-                .HasOne(a=>a.ESP)
-                .WithMany(u=>u.FOTAESPVersions)
-                .HasForeignKey(a=>a.FkESPId)
+                .HasOne(a => a.MainOwner)
+                .WithMany(u => u.MainOwnerFOTAs)
+                .HasForeignKey(a => a.FkMainOwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<FOTA>()
-                .HasOne(a=>a.STM)
-                .WithMany(u=>u.FOTASTMVersions)
-                .HasForeignKey(a=>a.FkSTMId)
+                .HasOne(a => a.ESP)
+                .WithMany(u => u.FOTAESPVersions)
+                .HasForeignKey(a => a.FkESPId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<FOTA>()
-                .HasOne(a=>a.Holtek)
-                .WithMany(u=>u.FOTAHoltekVersions)
-                .HasForeignKey(a=>a.FkHoltekId)
+                .HasOne(a => a.STM)
+                .WithMany(u => u.FOTASTMVersions)
+                .HasForeignKey(a => a.FkSTMId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<FOTA>()
-                .HasOne(a=>a.UserRoles)
-                .WithMany(u=>u.FOTAs)
-                .HasForeignKey(a=>a.FkUserRoleId)
+                .HasOne(a => a.Holtek)
+                .WithMany(u => u.FOTAHoltekVersions)
+                .HasForeignKey(a => a.FkHoltekId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+            builder.Entity<FOTA>()
+                .HasOne(a => a.UserRoles)
+                .WithMany(u => u.FOTAs)
+                .HasForeignKey(a => a.FkUserRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<SoftwareVersion>()
-                .HasOne(a=>a.UserRoles)
-                .WithMany(u=>u.SoftwareVersions)
-                .HasForeignKey(a=>a.FkUserRoleId)
+                .HasOne(a => a.UserRoles)
+                .WithMany(u => u.SoftwareVersions)
+                .HasForeignKey(a => a.FkUserRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Log>()
-                .HasOne(a=>a.Device)
-                .WithMany(u=>u.Logs)
-                .HasForeignKey(a=>a.FkDeviceId)
+                .HasOne(a => a.Device)
+                .WithMany(u => u.Logs)
+                .HasForeignKey(a => a.FkDeviceId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Log>()
-                .HasOne(a=>a.UserRole)
-                .WithMany(u=>u.Logs)
-                .HasForeignKey(a=>a.FkUserRoleId)
+                .HasOne(a => a.UserRole)
+                .WithMany(u => u.Logs)
+                .HasForeignKey(a => a.FkUserRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            builder.Entity<UserAndCompany>()
-                .HasOne(a=>a.User)
-                .WithMany(u=>u.UserAndCompanies)
-                .HasForeignKey(a=>a.FkUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
-            builder.Entity<UserAndCompany>()
-                .HasOne(a=>a.Company)
-                .WithMany(u=>u.UserAndCompanies)
-                .HasForeignKey(a=>a.FkCompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<UserRoles>()
-                .HasOne(a=>a.User)
-                .WithMany(u=>u.UserRoles)
-                .HasForeignKey(a=>a.FkUserId)
+                .HasOne(a => a.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(a => a.FkUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+            builder.Entity<User>()
+                .HasOne(a => a.Company)
+                .WithMany(u => u.Users)
+                .HasForeignKey(a => a.FkCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<UserRoles>()
-                .HasOne(a=>a.Role)
-                .WithMany(u=>u.UserRoles)
-                .HasForeignKey(a=>a.FkRoleId)
+                .HasOne(a => a.Role)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(a => a.FkRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
@@ -141,6 +142,26 @@ namespace GW.Core.Context
 
         private void SeedUser(ModelBuilder builder)
         {
+
+
+            builder.Entity<Company>().HasData(
+                new Company()
+                {
+                    Id = 1,
+                    Name = "Goldware",
+                    ShortName = "GW",
+                    Charge = 100_000_000,
+                    CreatedOn = SeedDate,
+                }, new Company()
+                {
+                    Id = 2,
+                    Name = "ASA Service",
+                    ShortName = "ASA",
+                    Charge = 3,
+                    CreatedOn = SeedDate,
+                }
+            );
+
             builder.Entity<User>().HasData(
                 new User
                 {
@@ -149,7 +170,8 @@ namespace GW.Core.Context
                     Password = "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6",
                     FName = "s",
                     LName = "hasanabadi",
-                    Mobile = "09155909973"
+                    Mobile = "09155909973",
+                    FkCompanyId = 1
                 });
 
             builder.Entity<Role>().HasData(
@@ -179,33 +201,6 @@ namespace GW.Core.Context
                 {
                     Id = SeedUserRoleId,
                     FkRoleId = 1,
-                    FkUserId = SeedUserId
-                });
-
-            builder.Entity<Company>().HasData(
-                new Company()
-                {
-                    Id = 1,
-                    Name = "Goldware",
-                    ShortName = "GW",
-                    Charge = 100_000_000,
-                    CreatedOn = SeedDate,
-                },  new Company()
-                {
-                    Id = 2,
-                    Name = "ASA Service",
-                    ShortName = "ASA",
-                    Charge = 3,
-                    CreatedOn = SeedDate,
-                }               
-            );
-
-
-            builder.Entity<UserAndCompany>().HasData(
-                new UserAndCompany
-                {
-                    Id = 1,
-                    FkCompanyId = 1,
                     FkUserId = SeedUserId
                 });
 
@@ -280,5 +275,5 @@ namespace GW.Core.Context
         }
     }
 
-   
+
 }

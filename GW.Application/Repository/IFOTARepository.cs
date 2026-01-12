@@ -4,15 +4,17 @@ using GW.Core.Context;
 using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace GW.Application.Repository
 {
     public interface IFOTARepository
     {
-        public Task<Result> InsertAsync(FOTADto fota, int userRole);
+        public Task<Result> InsertAsync(FOTADto fota, Guid userId);
         public Task<Result> InsertAndDeactiveSameFiles(FOTADto fota, int userRole);
         public FOTADto Check(FOTADto setting);
+        public Result<List<FOTADto>> All(UserDto user);
     }
 
     public class FOTARepository : IFOTARepository
@@ -32,7 +34,7 @@ namespace GW.Application.Repository
         #endregion
 
         #region Insert
-        public async Task<Result> InsertAsync(FOTADto fota, int userRole)
+        public async Task<Result> InsertAsync(FOTADto fota, Guid userId)
         {
             var check = _context.FOTA
                .Where(f =>
@@ -97,6 +99,11 @@ namespace GW.Application.Repository
                 if (softwareVersion is null) return Result.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
                 if (!string.IsNullOrEmpty(softwareVersion.Path))
                 {
+                    var userRole = _context.UserRoles
+                    .AsNoTracking()
+                    .Include(u => u.User)
+               .Where(u => u.FkUserId == userId).FirstOrDefault();
+                    if (userRole is null) return Result<int>.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!");
                     //FOTA fota_settings = _mapper.Map<FOTA>(setting);
                     FOTA fota_settings = new()
                     {
@@ -112,10 +119,11 @@ namespace GW.Application.Repository
                         FkESPId = fota.FkESPId,
                         FkHoltekId = fota.FkHoltekId,
                         FkOwnerId = fota.FkOwnerId,
+                        FkMainOwnerId = userRole.User.FkCompanyId,
                         FkSTMId = fota.FkSTMId,
                         HardwareVersion = fota.HardwareVersion,
                         Path = softwareVersion.Path,
-                        FkUserRoleId = userRole,
+                        FkUserRoleId = userRole.Id,
                         IsActive = true
                     };
                     _context.FOTA.Add(fota_settings);
@@ -241,6 +249,44 @@ namespace GW.Application.Repository
             return _mapper.Map<FOTADto>(fota);
         }
 
+        #endregion
+
+        #region All
+        public Result<List<FOTADto>> All(UserDto user)
+        {
+            List<FOTADto> result = new();
+            var check = _context.FOTA
+                .AsNoTracking()
+                .Include(d => d.ProductOwner)
+                .Include(d => d.STM)
+                .Include(d => d.ESP)
+                .Include(d => d.Holtek)
+                .Where(d => d.FkMainOwnerId == user.FkCompanyId)
+                .OrderByDescending(d => d.ProductionDate)
+                .Take(20);
+            foreach (var item in check)
+                result.Add(new()
+                {
+                    BatchNumber = item.BatchNumber,
+                    SerialNumber = item.SerialNumber,
+                    ProductCategory = item.ProductCategory,
+                    Type = item.Type,
+                    ProductionDate = item.ProductionDate,
+                    LastUpdate = item.LastUpdate,
+                    FkOwnerId = item.FkOwnerId,
+                    OwnerName = item.ProductOwner.Name,
+                    FkESPId = item.FkESPId,
+                    ESPVersion = item.ESP?.Version,
+                    FkHoltekId = item.FkHoltekId,
+                    HoltekVersion = item.Holtek?.Version,
+                    FkSTMId = item.FkSTMId,
+                    STMVersion = item.STM?.Version,
+                    HardwareVersion = item.HardwareVersion,
+                    MAC = item.MAC,
+                    IMEI = item.IMEI,
+                });
+            return Result<List<FOTADto>>.Ok(result);
+        }
         #endregion
     }
 }

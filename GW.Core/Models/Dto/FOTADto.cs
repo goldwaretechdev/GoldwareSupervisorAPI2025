@@ -29,8 +29,12 @@ namespace GW.Core.Models.Dto
         [MaxLength(50)]
         public string? IMEI { get; set; }
         public int? FkOwnerId { get; set; }
+        public string? OwnerName { get; set; }
         public int? FkESPId { get; set; }
+        public string? ESPVersion { get; set; }
         public int? FkSTMId { get; set; }
+        public string? STMVersion { get; set; }                                   
         public int? FkHoltekId { get; set; }
+        public string? HoltekVersion { get; set; }
     }
 }

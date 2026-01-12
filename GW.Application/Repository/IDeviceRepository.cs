@@ -11,7 +11,7 @@ namespace GW.Application.Repository
 {
     public interface IDeviceRepository
     {
-        public Result<int> Insert(SettingDto setting, int userRoleId);
+        public Result<int> Insert(SettingDto setting, Guid id);
         public Result Update(SettingDto setting, int userRoleId);
         public Result<SettingDto> GetSettings(string serial);
         public Result<List<SettingDto>> GetAllSettings(Guid userId);
@@ -32,10 +32,15 @@ namespace GW.Application.Repository
         }
 
         #region Insert
-        public Result<int> Insert(SettingDto setting, int userRoleId)
+        public Result<int> Insert(SettingDto setting, Guid id)
         {
             try
             {
+                var userRole = _context.UserRoles
+                    .AsNoTracking()
+                    .Include(u=>u.User)
+               .Where(u => u.FkUserId == id).FirstOrDefault();
+                if (userRole is null) return Result<int>.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!");
                 var check = !string.IsNullOrEmpty(setting.SerialNumber) ? _context.Devices
                .AsNoTracking()
                .Any(d => d.SerialNumber == setting.SerialNumber) : _context.Devices
@@ -44,8 +49,8 @@ namespace GW.Application.Repository
                 if (check)
                     return Result<int>.Fail(ErrorCode.DUPLICATE_DATA, "سریال وارد شده قبلا ثبت شده است!");
                 var device = _mapper.Map<Device>(setting);
-                device.FkUserRoleId=userRoleId;
-
+                device.FkUserRoleId=userRole.Id;
+                device.FkMainOwnerId=userRole.User.FkCompanyId;
                 _context.Devices.Add(device);
                 _context.SaveChanges();
 
@@ -108,9 +113,9 @@ namespace GW.Application.Repository
         #region GetAllSettings
         public Result<List<SettingDto>> GetAllSettings(Guid userId)
         {
-            var company = _context.UserAndCompany
-                .Where(u => u.FkUserId == userId).FirstOrDefault();
-            if (company is null) return Result<List<SettingDto>>.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!");
+            var user = _context.Users
+                .Where(u => u.Id == userId).FirstOrDefault();
+            if (user is null) return Result<List<SettingDto>>.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!");
             List<SettingDto> result = new();
             var check = _context.Devices
                 .AsNoTracking()
@@ -118,7 +123,7 @@ namespace GW.Application.Repository
                 .Include(d => d.STM)
                 .Include(d => d.ESP)
                 .Include(d => d.Holtek)
-                .Where(d=>d.FkOwnerId==company.FkCompanyId)
+                .Where(d=>d.FkMainOwnerId==user.FkCompanyId)
                 .OrderByDescending(d => d.ProductionDate)
                 .Take(20);
             foreach (var item in check)

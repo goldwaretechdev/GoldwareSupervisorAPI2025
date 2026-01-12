@@ -17,6 +17,7 @@ namespace GW.Application.Repository
         public Result<List<RoleDto>> Login(LoginInfo info);
         public Result<string> Token(LoginInfo info);
         public UserRoleDto? UserRole(Guid userId,string role);
+        public UserDto? User(Guid userId);
         public UserRoleDto? UserRoleByLoginInfo(LoginInfo info);
     }
 
@@ -83,6 +84,18 @@ namespace GW.Application.Repository
                 .FirstOrDefault();
             if (userRole is null) return null;
             return _mapper.Map<UserRoleDto>(userRole);
+        }
+        #endregion
+
+        #region User
+        public UserDto? User(Guid userId)
+        {
+            var user = _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .FirstOrDefault();
+            if (user is null) return null;
+            return _mapper.Map<UserDto>(user);
         }
         #endregion
 

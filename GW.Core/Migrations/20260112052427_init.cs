@@ -53,35 +53,16 @@ namespace GW.Core.Migrations
                     FName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Mobile = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserAndCompany",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FkUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Mobile = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     FkCompanyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserAndCompany", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserAndCompany_Company_FkCompanyId",
+                        name: "FK_Users_Company_FkCompanyId",
                         column: x => x.FkCompanyId,
                         principalTable: "Company",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserAndCompany_Users_FkUserId",
-                        column: x => x.FkUserId,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -158,6 +139,7 @@ namespace GW.Core.Migrations
                     MAC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     FkOwnerId = table.Column<int>(type: "int", nullable: false),
+                    FkMainOwnerId = table.Column<int>(type: "int", nullable: false),
                     FkESPId = table.Column<int>(type: "int", nullable: true),
                     FkSTMId = table.Column<int>(type: "int", nullable: true),
                     FkHoltekId = table.Column<int>(type: "int", nullable: true),
@@ -166,6 +148,12 @@ namespace GW.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Devices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Devices_Company_FkMainOwnerId",
+                        column: x => x.FkMainOwnerId,
+                        principalTable: "Company",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Devices_Company_FkOwnerId",
                         column: x => x.FkOwnerId,
@@ -218,6 +206,7 @@ namespace GW.Core.Migrations
                     IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     FkOwnerId = table.Column<int>(type: "int", nullable: true),
+                    FkMainOwnerId = table.Column<int>(type: "int", nullable: false),
                     FkESPId = table.Column<int>(type: "int", nullable: true),
                     FkSTMId = table.Column<int>(type: "int", nullable: true),
                     FkHoltekId = table.Column<int>(type: "int", nullable: true),
@@ -226,6 +215,12 @@ namespace GW.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FOTA", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FOTA_Company_FkMainOwnerId",
+                        column: x => x.FkMainOwnerId,
+                        principalTable: "Company",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_FOTA_Company_FkOwnerId",
                         column: x => x.FkOwnerId,
@@ -309,13 +304,8 @@ namespace GW.Core.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "FName", "LName", "Mobile", "Password", "Username" },
-                values: new object[] { new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"), "s", "hasanabadi", "09155909973", "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6", "sdh" });
-
-            migrationBuilder.InsertData(
-                table: "UserAndCompany",
-                columns: new[] { "Id", "FkCompanyId", "FkUserId" },
-                values: new object[] { 1, 1, new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05") });
+                columns: new[] { "Id", "FName", "FkCompanyId", "LName", "Mobile", "Password", "Username" },
+                values: new object[] { new Guid("d3b3c29a-4e2c-4b25-b6f4-2f8ebc4a1f05"), "s", 1, "hasanabadi", "09155909973", "$2a$13$IJx6qkqyuUqmuM7NLKZDM.V1SnroBT0ICRHtcaS1AwYkr6z4p1xr6", "sdh" });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
@@ -331,6 +321,11 @@ namespace GW.Core.Migrations
                 name: "IX_Devices_FkHoltekId",
                 table: "Devices",
                 column: "FkHoltekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Devices_FkMainOwnerId",
+                table: "Devices",
+                column: "FkMainOwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Devices_FkOwnerId",
@@ -356,6 +351,11 @@ namespace GW.Core.Migrations
                 name: "IX_FOTA_FkHoltekId",
                 table: "FOTA",
                 column: "FkHoltekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FOTA_FkMainOwnerId",
+                table: "FOTA",
+                column: "FkMainOwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FOTA_FkOwnerId",
@@ -388,16 +388,6 @@ namespace GW.Core.Migrations
                 column: "FkUserRoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAndCompany_FkCompanyId",
-                table: "UserAndCompany",
-                column: "FkCompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserAndCompany_FkUserId",
-                table: "UserAndCompany",
-                column: "FkUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_FkRoleId",
                 table: "UserRoles",
                 column: "FkRoleId");
@@ -406,6 +396,11 @@ namespace GW.Core.Migrations
                 name: "IX_UserRoles_FkUserId",
                 table: "UserRoles",
                 column: "FkUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_FkCompanyId",
+                table: "Users",
+                column: "FkCompanyId");
         }
 
         /// <inheritdoc />
@@ -418,13 +413,7 @@ namespace GW.Core.Migrations
                 name: "Logs");
 
             migrationBuilder.DropTable(
-                name: "UserAndCompany");
-
-            migrationBuilder.DropTable(
                 name: "Devices");
-
-            migrationBuilder.DropTable(
-                name: "Company");
 
             migrationBuilder.DropTable(
                 name: "SoftwareVersions");
@@ -437,6 +426,9 @@ namespace GW.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Company");
         }
     }
 }
