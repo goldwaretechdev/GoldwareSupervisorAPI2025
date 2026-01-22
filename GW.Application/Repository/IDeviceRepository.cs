@@ -14,6 +14,7 @@ namespace GW.Application.Repository
         public Result<int> Insert(SettingDto setting, Guid id);
         public Result Update(SettingDto setting, int userRoleId);
         public Result<SettingDto> GetSettings(string serial);
+        public Result Delete(string serial);
         public Result<List<SettingDto>> GetAllSettings(Guid userId);
         public Result<DeviceDto> GetDeviceByUniqueId(string id);
     }
@@ -107,6 +108,21 @@ namespace GW.Application.Repository
                 return Result<SettingDto>.Fail(ErrorCode.NOT_FOUND, "سریال وارد شده صحیح نیست!");
             result = _mapper.Map<SettingDto>(check);
             return Result<SettingDto>.Ok(result);
+        }
+        #endregion
+
+        #region Delete
+        public Result Delete(string serial)
+        {
+            var check = _context.Devices
+                .Where(d => d.SerialNumber == serial)
+                .FirstOrDefault();
+            if (check is null)
+                return Result.Fail(ErrorCode.NOT_FOUND, "سریال وارد شده صحیح نیست!");
+            //todo undo comments
+            //_context.Devices.Remove(check);
+            //_context.SaveChanges();
+            return Result.Ok();
         }
         #endregion        
 

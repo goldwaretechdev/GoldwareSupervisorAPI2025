@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace GW.SupervisorPanelAPI.Controller
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Development")]
     public class SettingsController : ControllerBase
@@ -43,7 +43,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region Owners
-        [HttpGet]
+        [HttpGet("[action]")]
         public IActionResult Owners()
         {
             try
@@ -60,7 +60,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region SoftwareVersions
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult SoftwareVersions([FromBody] RequestVersions request)
         {
             try
@@ -77,7 +77,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region SetDeviceSettings
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult SetDeviceSettings([FromBody] SettingDto request)
         {
             Result<int> result = new();
@@ -85,9 +85,9 @@ namespace GW.SupervisorPanelAPI.Controller
             try
             {
                 var token = Request.Headers[HeaderNames.Authorization].ToString();
-                //var role = _baseData.GetUserRole(token);
+                var role = _baseData.GetUserRole(token);
                 var userId = _baseData.GetUserId(token);
-                //userRole = _userRepository.UserRole(userId, role);
+                userRole = _userRepository.UserRole(userId, role);
                 //if (userRole is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
                 result = _deviceRepository.Insert(request,userId);
                
@@ -127,7 +127,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region UpdateSettings
-        [HttpPut]
+        [HttpPut("[action]")]
         public IActionResult UpdateSettings([FromBody] SettingDto request)
         {
             try
@@ -149,7 +149,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region GetSettings
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult GetSettings([FromBody] string serial)
         {
             try
@@ -164,9 +164,27 @@ namespace GW.SupervisorPanelAPI.Controller
             }
         }
         #endregion
+
+        #region Delete
+        [HttpDelete("{serial}")]
+        //[HttpDelete]
+        public async Task<IActionResult> Delete(string serial)
+        {
+            try
+            {
+                var result = _deviceRepository.Delete(serial);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetSettings Failed by input: {request}", serial);
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
         
         #region GetAllSettings
-        [HttpGet]
+        [HttpGet("[action]")]
         public IActionResult AllSettings()
         {
             try
@@ -185,9 +203,8 @@ namespace GW.SupervisorPanelAPI.Controller
         }
         #endregion
 
-
         #region UploadSoftwareFile
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> UploadSoftwareFile([FromForm] UploadSoftwareVersion version)
         {
             Result result = new();
@@ -241,7 +258,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region SoftwareFile 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult SoftwareFile([FromBody] int request)
         {
             Result result = new();
