@@ -57,4 +57,9 @@ namespace GW.Core.Models.Dto
         public string SetSetting { get; set; }
         public string UniqueId { get; set; }
     }
+
+    public class DataRequest
+    {
+        public int Id { get; set; }
+    }
 }

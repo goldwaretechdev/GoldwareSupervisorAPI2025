@@ -5,7 +5,6 @@ using GW.Core.Models;
 using GW.Core.Models.Dto;
 using GW.Core.Models.Shared;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace GW.Application.Repository
 {
@@ -15,6 +14,9 @@ namespace GW.Application.Repository
         public Task<Result> InsertAndDeactiveSameFiles(FOTADto fota, int userRole);
         public FOTADto Check(FOTADto setting);
         public Result<List<FOTADto>> All(UserDto user);
+        public Result<FOTADto> FOTA(int id, UserDto user);
+        public Result Delete(int id, UserDto user);
+        public Result Update(FOTADto fota, UserDto user);
     }
 
     public class FOTARepository : IFOTARepository
@@ -267,6 +269,7 @@ namespace GW.Application.Repository
             foreach (var item in check)
                 result.Add(new()
                 {
+                    Id = item.Id,
                     BatchNumber = item.BatchNumber,
                     SerialNumber = item.SerialNumber,
                     ProductCategory = item.ProductCategory,
@@ -284,8 +287,101 @@ namespace GW.Application.Repository
                     HardwareVersion = item.HardwareVersion,
                     MAC = item.MAC,
                     IMEI = item.IMEI,
+                    IsActive = item.IsActive
                 });
             return Result<List<FOTADto>>.Ok(result);
+        }
+        #endregion
+
+        #region FOTA
+        public Result<FOTADto> FOTA(int id, UserDto user)
+        {
+            var check = _context.FOTA
+                .AsNoTracking()
+                .Include(d => d.ProductOwner)
+                .Include(d => d.STM)
+                .Include(d => d.ESP)
+                .Include(d => d.Holtek)
+                .Where(d => d.Id == id && d.FkMainOwnerId == user.FkCompanyId)
+                .FirstOrDefault();
+            if (check is null) return Result<FOTADto>.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
+            var result = new FOTADto()
+            {
+                Id = check.Id,
+                BatchNumber = check.BatchNumber,
+                SerialNumber = check.SerialNumber,
+                ProductCategory = check.ProductCategory,
+                Type = check.Type,
+                ProductionDate = check.ProductionDate,
+                LastUpdate = check.LastUpdate,
+                ExpireDate = check.ExpireDate,
+                FkOwnerId = check.FkOwnerId,
+                OwnerName = check.ProductOwner.Name,
+                FkESPId = check.FkESPId,
+                ESPVersion = check.ESP?.Version,
+                FkHoltekId = check.FkHoltekId,
+                HoltekVersion = check.Holtek?.Version,
+                FkSTMId = check.FkSTMId,
+                STMVersion = check.STM?.Version,
+                HardwareVersion = check.HardwareVersion,
+                MAC = check.MAC,
+                IMEI = check.IMEI,
+                IsActive = check.IsActive
+            };
+            return Result<FOTADto>.Ok(result);
+        }
+        #endregion
+
+        #region Delete
+        public Result Delete(int id, UserDto user)
+        {
+            var check = _context.FOTA
+                .AsNoTracking()
+                .Where(d => d.Id == id && d.FkMainOwnerId == user.FkCompanyId)
+                .FirstOrDefault();
+            if (check is null) return Result<FOTADto>.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
+
+            //_context.FOTA.Remove(check);
+            //_context.SaveChanges();
+            return Result.Ok();
+        }
+        #endregion
+
+        #region Update
+        public Result Update(FOTADto fota, UserDto user)
+        {
+            var check = _context.FOTA
+                .Include(d => d.ProductOwner)
+                .Include(d => d.STM)
+                .Include(d => d.ESP)
+                .Include(d => d.Holtek)
+                .Where(d => d.Id == fota.Id && d.FkMainOwnerId == user.FkCompanyId)
+                .FirstOrDefault();
+            if (check is null) return Result<FOTADto>.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
+            var softwareVersion = _context.SoftwareVersions.Where(s => fota.FkESPId != null ?
+                   s.Id == fota.FkESPId : fota.FkSTMId != null ?
+                   s.Id == fota.FkSTMId : s.Id == fota.FkHoltekId).FirstOrDefault();
+            if (softwareVersion is null) return Result.Fail(ErrorCode.INVALID_ID, "شناسه نامعتبر!");
+
+            check.BatchNumber = fota.BatchNumber;
+            check.SerialNumber = fota.SerialNumber;
+            check.ProductCategory = fota.ProductCategory;
+            check.Type = fota.Type;
+            check.ProductionDate = fota.ProductionDate;
+            check.LastUpdate = fota.LastUpdate;
+            check.ExpireDate = fota.ExpireDate;
+            check.FkOwnerId = fota.FkOwnerId;
+            check.FkESPId = fota.FkESPId;
+            check.FkHoltekId = fota.FkHoltekId;
+            check.FkSTMId = fota.FkSTMId;
+            check.HardwareVersion = fota.HardwareVersion;
+            check.MAC = fota.MAC;
+            check.IMEI = fota.IMEI;
+            check.Path = softwareVersion.Path;
+            check.IsActive = fota.IsActive;
+            _context.FOTA.Update(check);
+            _context.SaveChanges();
+            return Result.Ok();
         }
         #endregion
     }

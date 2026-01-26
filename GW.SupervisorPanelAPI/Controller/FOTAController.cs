@@ -11,7 +11,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace GW.SupervisorPanelAPI.Controller
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Development")]
     public class FOTAController : ControllerBase
@@ -38,7 +38,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region All
-        [HttpGet]
+        [HttpGet("[action]")]
         public IActionResult All()
         {
             try
@@ -54,6 +54,74 @@ namespace GW.SupervisorPanelAPI.Controller
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Get AllFOTAs Failed");
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+
+        #region Delete
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var userDto = _userRepository.User(userId);
+                if (userDto is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                var response = _fotaRepository.Delete(id,userDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Get FOTA Failed by input: {request}", id);
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+       
+        #region Get
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult Get(int id)
+        {
+            try
+            {
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var userDto = _userRepository.User(userId);
+                if (userDto is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                var response = _fotaRepository.FOTA(id,userDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Get FOTA Failed by input: {request}", id);
+                return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
+            }
+        }
+        #endregion
+        
+        #region Put
+        [HttpPut]
+        public IActionResult Put([FromBody]FOTADto request)
+        {
+            try
+            {
+                var token = Request.Headers[HeaderNames.Authorization].ToString();
+                var role = _baseData.GetUserRole(token);
+                var userId = _baseData.GetUserId(token);
+                var userDto = _userRepository.User(userId);
+                if (userDto is null) return Ok(Result.Fail(ErrorCode.NOT_FOUND, "کاربر غیرمجاز!"));
+                var response = _fotaRepository.Update(request,userDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Put FOTA Failed by input: {request}", request);
                 return BadRequest(new { ErrorCode.INTERNAL_ERROR, ex.Message });
             }
         }
@@ -112,7 +180,7 @@ namespace GW.SupervisorPanelAPI.Controller
         #endregion
 
         #region DeactivatePrevSameFiles
-        [HttpPut]
+        [HttpPut("[action]")]
         public async Task<IActionResult> DeactivatePrevSameFiles([FromBody] FOTADto request)
         {
             Result result = new();

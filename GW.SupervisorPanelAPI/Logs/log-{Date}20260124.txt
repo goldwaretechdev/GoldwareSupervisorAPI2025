@@ -1,0 +1,27 @@
+2026-01-24 10:06:21.118 +03:30 [ERR] GetSettings Failed by input: 1646AD176A
+AutoMapper.AutoMapperMappingException: Missing type map configuration or unsupported mapping.
+
+Mapping types:
+Device -> SettingDto
+GW.Core.Models.Device -> GW.Core.Models.Dto.SettingDto
+   at lambda_method293(Closure, Object, SettingDto, ResolutionContext)
+   at GW.Application.Repository.DeviceRepository.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.Application\Repository\IDeviceRepository.cs:line 109
+   at GW.SupervisorPanelAPI.Controller.SettingsController.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.SupervisorPanelAPI\Controller\SettingsController.cs:line 157
+2026-01-24 10:06:39.477 +03:30 [ERR] GetSettings Failed by input: 1646AD176A
+AutoMapper.AutoMapperMappingException: Missing type map configuration or unsupported mapping.
+
+Mapping types:
+Device -> SettingDto
+GW.Core.Models.Device -> GW.Core.Models.Dto.SettingDto
+   at lambda_method293(Closure, Object, SettingDto, ResolutionContext)
+   at GW.Application.Repository.DeviceRepository.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.Application\Repository\IDeviceRepository.cs:line 109
+   at GW.SupervisorPanelAPI.Controller.SettingsController.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.SupervisorPanelAPI\Controller\SettingsController.cs:line 157
+2026-01-24 10:07:00.243 +03:30 [ERR] GetSettings Failed by input: 1646AD176A
+AutoMapper.AutoMapperMappingException: Missing type map configuration or unsupported mapping.
+
+Mapping types:
+Device -> SettingDto
+GW.Core.Models.Device -> GW.Core.Models.Dto.SettingDto
+   at lambda_method293(Closure, Object, SettingDto, ResolutionContext)
+   at GW.Application.Repository.DeviceRepository.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.Application\Repository\IDeviceRepository.cs:line 109
+   at GW.SupervisorPanelAPI.Controller.SettingsController.GetSettings(String serial) in D:\Hasanabadi\Projects\GoldwareSupervisorAPI2025\GW.SupervisorPanelAPI\Controller\SettingsController.cs:line 157

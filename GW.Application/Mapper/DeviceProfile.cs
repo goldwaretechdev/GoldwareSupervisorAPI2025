@@ -13,7 +13,7 @@ namespace GW.Application.Mapper
     {
         public DeviceProfile()
         {
-            CreateMap<SettingDto, Device>();
+            CreateMap<SettingDto, Device>().ReverseMap();
             //CreateMap<Device, SettingDto>()
             //.ForPath(dest => dest.OwnerName,
             //    opt => opt.MapFrom(src => src.ProductOwner.Name))

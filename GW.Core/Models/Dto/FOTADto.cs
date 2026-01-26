@@ -10,7 +10,7 @@ namespace GW.Core.Models.Dto
 {
     public class FOTADto
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public DeviceType Type { get; set; }
         public string? Path { get; set; }
         public ProductCategory? ProductCategory { get; set; }
